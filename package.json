@@ -1,0 +1,20 @@
+{
+  "name": "web-a11y-platform",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "turbo": "^2.10.2"
+  },
+  "packageManager": "npm@10.9.1",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
