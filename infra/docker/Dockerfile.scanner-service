@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copier les fichiers de config du monorepo (nécessaires pour npm workspaces)
+COPY package*.json ./
+COPY apps/scanner-service/package.json ./apps/scanner-service/
+COPY packages ./packages
+
+# Installer les dépendances
+RUN npm install
+
+# Copier le code du service
+COPY apps/scanner-service ./apps/scanner-service
+
+WORKDIR /app/apps/scanner-service
+
+CMD ["npm", "run", "dev"]

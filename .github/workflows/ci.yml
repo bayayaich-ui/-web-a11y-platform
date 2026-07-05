@@ -31,3 +31,5 @@ jobs:
 
       - name: Lancer les tests
         run: npx turbo test
+      - name: Build Docker scanner-service
+        run: docker build -f infra/docker/Dockerfile.scanner-service -t scanner-service .
