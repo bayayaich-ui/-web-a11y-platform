@@ -8,7 +8,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "turbo": "^2.10.2"
   },
@@ -16,5 +15,9 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "directories": {
+    "doc": "docs"
+  },
+  "description": ""
 }
