@@ -1,0 +1,1890 @@
+[
+  {
+    "id": "1.1.1",
+    "name": "Non-text Content",
+    "level": "A",
+    "requirement": "Provide text alternatives for non-text content",
+    "principle": "Perceivable",
+    "guideline_id": "1.1",
+    "guideline_name": "Text Alternatives",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "image-alt",
+      "input-image-alt",
+      "area-alt",
+      "object-alt",
+      "role-img-alt",
+      "svg-img-alt"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "images",
+      "icons",
+      "charts",
+      "buttons",
+      "form-controls"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-content.html",
+    "exceptions": "Decorative images that convey no information can be marked so assistive technology ignores them."
+  },
+  {
+    "id": "1.2.1",
+    "name": "Audio-only and Video-only (Prerecorded)",
+    "level": "A",
+    "requirement": "Provide alternatives for prerecorded audio/video",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "audio",
+      "video"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-only-and-video-only-prerecorded.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.2.2",
+    "name": "Captions (Prerecorded)",
+    "level": "A",
+    "requirement": "Provide captions for prerecorded audio in video",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "video"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/captions-prerecorded.html",
+    "exceptions": "Does not apply to media that is itself an alternative to text and is clearly labeled as such."
+  },
+  {
+    "id": "1.2.3",
+    "name": "Audio Description or Media Alternative",
+    "level": "A",
+    "requirement": "Provide audio description or text alternative",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "video"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-description-or-media-alternative.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.2.4",
+    "name": "Captions (Live)",
+    "level": "AA",
+    "requirement": "Provide captions for live audio in video",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "video",
+      "live-stream"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/captions-live.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.2.5",
+    "name": "Audio Description (Prerecorded)",
+    "level": "AA",
+    "requirement": "Provide audio description for prerecorded video",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "video"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-description-prerecorded.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.2.6",
+    "name": "Sign Language (Prerecorded)",
+    "level": "AAA",
+    "requirement": "Provide sign language interpretation",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "video"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/sign-language-prerecorded.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.2.7",
+    "name": "Extended Audio Description",
+    "level": "AAA",
+    "requirement": "Provide extended audio description when needed",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "video"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/extended-audio-description.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.2.8",
+    "name": "Media Alternative (Prerecorded)",
+    "level": "AAA",
+    "requirement": "Provide text alternative for prerecorded media",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "video",
+      "audio"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/media-alternative-prerecorded.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.2.9",
+    "name": "Audio-only (Live)",
+    "level": "AAA",
+    "requirement": "Provide alternative for live audio content",
+    "principle": "Perceivable",
+    "guideline_id": "1.2",
+    "guideline_name": "Time-Based Media",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "audio",
+      "live-stream"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-only-live.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.3.1",
+    "name": "Info and Relationships",
+    "level": "A",
+    "requirement": "Preserve structure and relationships in code",
+    "principle": "Perceivable",
+    "guideline_id": "1.3",
+    "guideline_name": "Adaptable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "landmark-one-main",
+      "list",
+      "listitem",
+      "definition-list",
+      "dlitem",
+      "th-has-data-cells",
+      "td-headers-attr"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "tables",
+      "lists",
+      "forms",
+      "headings"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.3.2",
+    "name": "Meaningful Sequence",
+    "level": "A",
+    "requirement": "Maintain correct reading sequence in code",
+    "principle": "Perceivable",
+    "guideline_id": "1.3",
+    "guideline_name": "Adaptable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "layout"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/meaningful-sequence.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.3.3",
+    "name": "Sensory Characteristics",
+    "level": "A",
+    "requirement": "Don't rely solely on shape, size, location, or sound",
+    "principle": "Perceivable",
+    "guideline_id": "1.3",
+    "guideline_name": "Adaptable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "instructions"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/sensory-characteristics.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.3.4",
+    "name": "Orientation",
+    "level": "AA",
+    "requirement": "Don't restrict content to single display orientation",
+    "principle": "Perceivable",
+    "guideline_id": "1.3",
+    "guideline_name": "Adaptable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "layout",
+      "mobile"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/orientation.html",
+    "exceptions": "Does not apply where a specific orientation is essential (e.g. a piano app)."
+  },
+  {
+    "id": "1.3.5",
+    "name": "Identify Input Purpose",
+    "level": "AA",
+    "requirement": "Identify the purpose of input fields",
+    "principle": "Perceivable",
+    "guideline_id": "1.3",
+    "guideline_name": "Adaptable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "autocomplete-valid"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/identify-input-purpose.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.3.6",
+    "name": "Identify Purpose",
+    "level": "AAA",
+    "requirement": "Identify the purpose of UI components",
+    "principle": "Perceivable",
+    "guideline_id": "1.3",
+    "guideline_name": "Adaptable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "icons",
+      "regions",
+      "controls"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/identify-purpose.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.1",
+    "name": "Use of Color",
+    "level": "A",
+    "requirement": "Don't use color as only visual means of conveying info",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "links",
+      "charts",
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.2",
+    "name": "Audio Control",
+    "level": "A",
+    "requirement": "Provide mechanism to pause/stop audio over 3 seconds",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "audio"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-control.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.3",
+    "name": "Contrast (Minimum)",
+    "level": "AA",
+    "requirement": "Text has a contrast ratio of at least 4.5:1",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "color-contrast"
+    ],
+    "thresholds": {
+      "AA": {
+        "normal_text": 4.5,
+        "large_text": 3.0
+      }
+    },
+    "applies_to": [
+      "text",
+      "buttons",
+      "links"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+    "exceptions": "Does not apply to decorative text, logos, or text in an inactive UI component."
+  },
+  {
+    "id": "1.4.4",
+    "name": "Resize Text",
+    "level": "AA",
+    "requirement": "Text resizable up to 200% without loss of function",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": {
+      "AA": {
+        "resize_percent": 200
+      }
+    },
+    "applies_to": [
+      "text"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.5",
+    "name": "Images of Text",
+    "level": "AA",
+    "requirement": "Use text instead of images of text when possible",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "images"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/images-of-text.html",
+    "exceptions": "Does not apply to logotypes or when a specific presentation is essential."
+  },
+  {
+    "id": "1.4.6",
+    "name": "Contrast (Enhanced)",
+    "level": "AAA",
+    "requirement": "Text contrast ratio of at least 7:1",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "automated",
+    "eaa_applicable": false,
+    "axe_core_rules": [
+      "color-contrast-enhanced"
+    ],
+    "thresholds": {
+      "AAA": {
+        "normal_text": 7.0,
+        "large_text": 4.5
+      }
+    },
+    "applies_to": [
+      "text",
+      "buttons",
+      "links"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.7",
+    "name": "Low or No Background Audio",
+    "level": "AAA",
+    "requirement": "Speech recordings have minimal background noise",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "audio"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/low-or-no-background-audio.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.8",
+    "name": "Visual Presentation",
+    "level": "AAA",
+    "requirement": "Text formatting options for readability",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "text",
+      "layout"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.9",
+    "name": "Images of Text (No Exception)",
+    "level": "AAA",
+    "requirement": "Images of text only for decoration or essential",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "images"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/images-of-text-no-exception.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.10",
+    "name": "Reflow",
+    "level": "AA",
+    "requirement": "Content reflows without horizontal scrolling at 400%",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": {
+      "AA": {
+        "zoom_percent": 400,
+        "viewport_width_px": 320
+      }
+    },
+    "applies_to": [
+      "layout"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/reflow.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.11",
+    "name": "Non-text Contrast",
+    "level": "AA",
+    "requirement": "UI components have 3:1 contrast ratio",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "color-contrast"
+    ],
+    "thresholds": {
+      "AA": {
+        "ratio": 3.0
+      }
+    },
+    "applies_to": [
+      "buttons",
+      "form-controls",
+      "icons",
+      "graphs"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.12",
+    "name": "Text Spacing",
+    "level": "AA",
+    "requirement": "No loss of content with adjusted text spacing",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": {
+      "AA": {
+        "line_height": 1.5,
+        "paragraph_spacing_em": 2.0,
+        "letter_spacing_em": 0.12,
+        "word_spacing_em": 0.16
+      }
+    },
+    "applies_to": [
+      "text"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html",
+    "exceptions": null
+  },
+  {
+    "id": "1.4.13",
+    "name": "Content on Hover or Focus",
+    "level": "AA",
+    "requirement": "Dismissable, hoverable, persistent content",
+    "principle": "Perceivable",
+    "guideline_id": "1.4",
+    "guideline_name": "Distinguishable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "tooltips",
+      "popovers"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.1.1",
+    "name": "Keyboard",
+    "level": "A",
+    "requirement": "All functionality available via keyboard",
+    "principle": "Operable",
+    "guideline_id": "2.1",
+    "guideline_name": "Keyboard Accessible",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "interactive-elements"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html",
+    "exceptions": "Does not apply to activities requiring input that depends on the path of user movement (e.g. free-hand drawing)."
+  },
+  {
+    "id": "2.1.2",
+    "name": "No Keyboard Trap",
+    "level": "A",
+    "requirement": "Keyboard focus can move away from components",
+    "principle": "Operable",
+    "guideline_id": "2.1",
+    "guideline_name": "Keyboard Accessible",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "widgets",
+      "embedded-content"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/no-keyboard-trap.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.1.3",
+    "name": "Keyboard (No Exception)",
+    "level": "AAA",
+    "requirement": "All functionality available via keyboard",
+    "principle": "Operable",
+    "guideline_id": "2.1",
+    "guideline_name": "Keyboard Accessible",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "interactive-elements"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard-no-exception.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.1.4",
+    "name": "Character Key Shortcuts",
+    "level": "A",
+    "requirement": "Shortcuts using only letters can be turned off",
+    "principle": "Operable",
+    "guideline_id": "2.1",
+    "guideline_name": "Keyboard Accessible",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "keyboard-shortcuts"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.2.1",
+    "name": "Timing Adjustable",
+    "level": "A",
+    "requirement": "Time limits can be extended or turned off",
+    "principle": "Operable",
+    "guideline_id": "2.2",
+    "guideline_name": "Enough Time",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "sessions",
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable.html",
+    "exceptions": "Does not apply to real-time events or essential time limits (e.g. an auction)."
+  },
+  {
+    "id": "2.2.2",
+    "name": "Pause, Stop, Hide",
+    "level": "A",
+    "requirement": "Moving content can be paused, stopped, or hidden",
+    "principle": "Operable",
+    "guideline_id": "2.2",
+    "guideline_name": "Enough Time",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "carousels",
+      "animations",
+      "auto-updating-content"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.2.3",
+    "name": "No Timing",
+    "level": "AAA",
+    "requirement": "Timing not essential part of activity",
+    "principle": "Operable",
+    "guideline_id": "2.2",
+    "guideline_name": "Enough Time",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "timed-activities"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/no-timing.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.2.4",
+    "name": "Interruptions",
+    "level": "AAA",
+    "requirement": "Interruptions can be postponed or suppressed",
+    "principle": "Operable",
+    "guideline_id": "2.2",
+    "guideline_name": "Enough Time",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "notifications"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/interruptions.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.2.5",
+    "name": "Re-authenticating",
+    "level": "AAA",
+    "requirement": "Data preserved after re-authentication",
+    "principle": "Operable",
+    "guideline_id": "2.2",
+    "guideline_name": "Enough Time",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "authentication",
+      "sessions"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/re-authenticating.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.2.6",
+    "name": "Timeouts",
+    "level": "AAA",
+    "requirement": "Users warned about data loss from inactivity",
+    "principle": "Operable",
+    "guideline_id": "2.2",
+    "guideline_name": "Enough Time",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "sessions"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/timeouts.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.3.1",
+    "name": "Three Flashes or Below Threshold",
+    "level": "A",
+    "requirement": "No content flashes more than 3 times per second",
+    "principle": "Operable",
+    "guideline_id": "2.3",
+    "guideline_name": "Seizures and Physical Reactions",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": {
+      "A": {
+        "max_flashes_per_second": 3
+      }
+    },
+    "applies_to": [
+      "animations",
+      "video"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.3.2",
+    "name": "Three Flashes",
+    "level": "AAA",
+    "requirement": "No content flashes more than 3 times per second",
+    "principle": "Operable",
+    "guideline_id": "2.3",
+    "guideline_name": "Seizures and Physical Reactions",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": {
+      "AAA": {
+        "max_flashes_per_second": 3
+      }
+    },
+    "applies_to": [
+      "animations",
+      "video"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.3.3",
+    "name": "Animation from Interactions",
+    "level": "AAA",
+    "requirement": "Motion animation can be disabled",
+    "principle": "Operable",
+    "guideline_id": "2.3",
+    "guideline_name": "Seizures and Physical Reactions",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "animations"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.1",
+    "name": "Bypass Blocks",
+    "level": "A",
+    "requirement": "Mechanism to bypass repeated content blocks",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "bypass",
+      "skip-link",
+      "region"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "navigation"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/bypass-blocks.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.2",
+    "name": "Page Titled",
+    "level": "A",
+    "requirement": "Pages have descriptive titles",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "document-title"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "page-metadata"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/page-titled.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.3",
+    "name": "Focus Order",
+    "level": "A",
+    "requirement": "Focus order preserves meaning and operability",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "interactive-elements"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-order.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.4",
+    "name": "Link Purpose (In Context)",
+    "level": "A",
+    "requirement": "Link purpose determinable from link or context",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "link-name"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "links"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.5",
+    "name": "Multiple Ways",
+    "level": "AA",
+    "requirement": "Multiple ways to locate pages within a site",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "navigation",
+      "sitemap",
+      "search"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html",
+    "exceptions": "Does not apply to a single step in a process."
+  },
+  {
+    "id": "2.4.6",
+    "name": "Headings and Labels",
+    "level": "AA",
+    "requirement": "Headings and labels describe topic or purpose",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "empty-heading",
+      "label-title-only"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "headings",
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.7",
+    "name": "Focus Visible",
+    "level": "AA",
+    "requirement": "Keyboard focus indicator is visible",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "interactive-elements"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.8",
+    "name": "Location",
+    "level": "AAA",
+    "requirement": "Information about user's location in site",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "navigation",
+      "breadcrumbs"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/location.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.9",
+    "name": "Link Purpose (Link Only)",
+    "level": "AAA",
+    "requirement": "Link purpose determinable from link text alone",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": false,
+    "axe_core_rules": [
+      "link-name"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "links"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-link-only.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.10",
+    "name": "Section Headings",
+    "level": "AAA",
+    "requirement": "Section headings used to organize content",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "headings"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/section-headings.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.11",
+    "name": "Focus Not Obscured (Minimum)",
+    "level": "AA",
+    "requirement": "Focused component not entirely hidden",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "sticky-headers",
+      "modals"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.12",
+    "name": "Focus Not Obscured (Enhanced)",
+    "level": "AAA",
+    "requirement": "Focused component not partially hidden",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "sticky-headers",
+      "modals"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.4.13",
+    "name": "Focus Appearance",
+    "level": "AAA",
+    "requirement": "Focus indicators meet size and contrast requirements",
+    "principle": "Operable",
+    "guideline_id": "2.4",
+    "guideline_name": "Navigable",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": {
+      "AAA": {
+        "min_area_px": 4,
+        "contrast_ratio": 3.0
+      }
+    },
+    "applies_to": [
+      "interactive-elements"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.5.1",
+    "name": "Pointer Gestures",
+    "level": "A",
+    "requirement": "Multi-point gestures have single-point alternatives",
+    "principle": "Operable",
+    "guideline_id": "2.5",
+    "guideline_name": "Input Modalities",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "touch-gestures"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.5.2",
+    "name": "Pointer Cancellation",
+    "level": "A",
+    "requirement": "Down-event not used to trigger functions",
+    "principle": "Operable",
+    "guideline_id": "2.5",
+    "guideline_name": "Input Modalities",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "buttons",
+      "touch"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.5.3",
+    "name": "Label in Name",
+    "level": "A",
+    "requirement": "Visible label included in accessible name",
+    "principle": "Operable",
+    "guideline_id": "2.5",
+    "guideline_name": "Input Modalities",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "label-content-name-mismatch"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "buttons",
+      "links",
+      "form-controls"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.5.4",
+    "name": "Motion Actuation",
+    "level": "A",
+    "requirement": "Motion-triggered functions have alternatives",
+    "principle": "Operable",
+    "guideline_id": "2.5",
+    "guideline_name": "Input Modalities",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "device-motion"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/motion-actuation.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.5.5",
+    "name": "Target Size (Enhanced)",
+    "level": "AAA",
+    "requirement": "Touch targets at least 44x44 CSS pixels",
+    "principle": "Operable",
+    "guideline_id": "2.5",
+    "guideline_name": "Input Modalities",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": {
+      "AAA": {
+        "min_size_px": 44
+      }
+    },
+    "applies_to": [
+      "buttons",
+      "links",
+      "touch-targets"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.5.6",
+    "name": "Concurrent Input Mechanisms",
+    "level": "AAA",
+    "requirement": "Don't restrict input to single modality",
+    "principle": "Operable",
+    "guideline_id": "2.5",
+    "guideline_name": "Input Modalities",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms",
+      "controls"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/concurrent-input-mechanisms.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.5.7",
+    "name": "Dragging Movements",
+    "level": "AA",
+    "requirement": "Dragging has single-pointer alternatives",
+    "principle": "Operable",
+    "guideline_id": "2.5",
+    "guideline_name": "Input Modalities",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "drag-and-drop",
+      "sliders"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html",
+    "exceptions": null
+  },
+  {
+    "id": "2.5.8",
+    "name": "Target Size (Minimum)",
+    "level": "AA",
+    "requirement": "Touch targets at least 24x24 CSS pixels",
+    "principle": "Operable",
+    "guideline_id": "2.5",
+    "guideline_name": "Input Modalities",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "semi-automated",
+    "eaa_applicable": false,
+    "axe_core_rules": [
+      "target-size"
+    ],
+    "thresholds": {
+      "AA": {
+        "min_size_px": 24
+      }
+    },
+    "applies_to": [
+      "buttons",
+      "links",
+      "touch-targets"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
+    "exceptions": "Does not apply to inline links in text, or when the target size is determined by the browser and not modified."
+  },
+  {
+    "id": "3.1.1",
+    "name": "Language of Page",
+    "level": "A",
+    "requirement": "Default language can be programmatically determined",
+    "principle": "Understandable",
+    "guideline_id": "3.1",
+    "guideline_name": "Readable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "html-has-lang",
+      "html-lang-valid",
+      "html-xml-lang-mismatch"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "page-metadata"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.1.2",
+    "name": "Language of Parts",
+    "level": "AA",
+    "requirement": "Language of passages can be programmatically determined",
+    "principle": "Understandable",
+    "guideline_id": "3.1",
+    "guideline_name": "Readable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "valid-lang"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "text"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/language-of-parts.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.1.3",
+    "name": "Unusual Words",
+    "level": "AAA",
+    "requirement": "Mechanism for definitions of unusual words",
+    "principle": "Understandable",
+    "guideline_id": "3.1",
+    "guideline_name": "Readable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "text"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/unusual-words.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.1.4",
+    "name": "Abbreviations",
+    "level": "AAA",
+    "requirement": "Mechanism for expansions of abbreviations",
+    "principle": "Understandable",
+    "guideline_id": "3.1",
+    "guideline_name": "Readable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "text"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/abbreviations.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.1.5",
+    "name": "Reading Level",
+    "level": "AAA",
+    "requirement": "Supplemental content for complex text",
+    "principle": "Understandable",
+    "guideline_id": "3.1",
+    "guideline_name": "Readable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "text"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/reading-level.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.1.6",
+    "name": "Pronunciation",
+    "level": "AAA",
+    "requirement": "Mechanism for pronunciation of ambiguous words",
+    "principle": "Understandable",
+    "guideline_id": "3.1",
+    "guideline_name": "Readable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "text"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/pronunciation.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.2.1",
+    "name": "On Focus",
+    "level": "A",
+    "requirement": "No context change on focus",
+    "principle": "Understandable",
+    "guideline_id": "3.2",
+    "guideline_name": "Predictable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms",
+      "interactive-elements"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/on-focus.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.2.2",
+    "name": "On Input",
+    "level": "A",
+    "requirement": "No context change on input without warning",
+    "principle": "Understandable",
+    "guideline_id": "3.2",
+    "guideline_name": "Predictable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/on-input.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.2.3",
+    "name": "Consistent Navigation",
+    "level": "AA",
+    "requirement": "Navigation appears in consistent order",
+    "principle": "Understandable",
+    "guideline_id": "3.2",
+    "guideline_name": "Predictable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "navigation"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-navigation.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.2.4",
+    "name": "Consistent Identification",
+    "level": "AA",
+    "requirement": "Same functions identified consistently",
+    "principle": "Understandable",
+    "guideline_id": "3.2",
+    "guideline_name": "Predictable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "icons",
+      "buttons"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.2.5",
+    "name": "Change on Request",
+    "level": "AAA",
+    "requirement": "Context changes only on user request",
+    "principle": "Understandable",
+    "guideline_id": "3.2",
+    "guideline_name": "Predictable",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms",
+      "navigation"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/change-on-request.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.2.6",
+    "name": "Consistent Help",
+    "level": "A",
+    "requirement": "Help mechanisms appear in consistent location",
+    "principle": "Understandable",
+    "guideline_id": "3.2",
+    "guideline_name": "Predictable",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "help",
+      "support-links"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-help.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.3.1",
+    "name": "Error Identification",
+    "level": "A",
+    "requirement": "Errors automatically detected and described",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.3.2",
+    "name": "Labels or Instructions",
+    "level": "A",
+    "requirement": "Labels or instructions provided for input",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "label",
+      "form-field-multiple-labels"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/labels-or-instructions.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.3.3",
+    "name": "Error Suggestion",
+    "level": "AA",
+    "requirement": "Suggestions for fixing errors when known",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/error-suggestion.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.3.4",
+    "name": "Error Prevention (Legal, Financial, Data)",
+    "level": "AA",
+    "requirement": "Submissions reversible, checked, or confirmed",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms",
+      "transactions"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.3.5",
+    "name": "Help",
+    "level": "AAA",
+    "requirement": "Context-sensitive help available",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/help.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.3.6",
+    "name": "Error Prevention (All)",
+    "level": "AAA",
+    "requirement": "All submissions reversible, checked, or confirmed",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-all.html",
+    "exceptions": null
+  },
+  {
+    "id": "3.3.7",
+    "name": "Redundant Entry",
+    "level": "A",
+    "requirement": "Auto-populate previously entered information",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "multi-step-forms"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/redundant-entry.html",
+    "exceptions": "Does not apply when re-entry is essential (e.g. security fields)."
+  },
+  {
+    "id": "3.3.8",
+    "name": "Accessible Authentication (Minimum)",
+    "level": "AA",
+    "requirement": "No cognitive function test for authentication",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "authentication",
+      "login"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum.html",
+    "exceptions": "Object recognition and identification of non-text content submitted by the user are permitted."
+  },
+  {
+    "id": "3.3.9",
+    "name": "Accessible Authentication (Enhanced)",
+    "level": "AAA",
+    "requirement": "No object or user-supplied content recognition",
+    "principle": "Understandable",
+    "guideline_id": "3.3",
+    "guideline_name": "Input Assistance",
+    "wcag_version": "2.2",
+    "new_in_version": "2.2",
+    "test_type": "manual",
+    "eaa_applicable": false,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "authentication",
+      "login"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-enhanced.html",
+    "exceptions": null
+  },
+  {
+    "id": "4.1.2",
+    "name": "Name, Role, Value",
+    "level": "A",
+    "requirement": "Name, role, value available for all UI components",
+    "principle": "Robust",
+    "guideline_id": "4.1",
+    "guideline_name": "Compatible",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [
+      "aria-allowed-attr",
+      "aria-required-attr",
+      "aria-roles",
+      "button-name",
+      "aria-valid-attr-value",
+      "aria-valid-attr",
+      "select-name",
+      "aria-command-name",
+      "aria-input-field-name",
+      "aria-toggle-field-name"
+    ],
+    "thresholds": null,
+    "applies_to": [
+      "widgets",
+      "form-controls",
+      "aria-components"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html",
+    "exceptions": null
+  },
+  {
+    "id": "4.1.3",
+    "name": "Status Messages",
+    "level": "AA",
+    "requirement": "Status messages announced to assistive technologies",
+    "principle": "Robust",
+    "guideline_id": "4.1",
+    "guideline_name": "Compatible",
+    "wcag_version": "2.2",
+    "new_in_version": null,
+    "test_type": "semi-automated",
+    "eaa_applicable": true,
+    "axe_core_rules": [],
+    "thresholds": null,
+    "applies_to": [
+      "notifications",
+      "live-regions"
+    ],
+    "understanding_url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+    "exceptions": null
+  }
+]
