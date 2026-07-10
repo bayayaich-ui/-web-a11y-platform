@@ -11,5 +11,8 @@
   "description": "",
   "devDependencies": {
     "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "axe-core": "^4.12.1"
   }
 }
