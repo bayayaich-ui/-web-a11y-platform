@@ -1,11 +1,10 @@
-import { getWCAGCriterion } from "./mapping";
+import { getWCAGCriteria } from "./mapping";
 
+export function parseAxeResults(violations: any[]) {
 
-export function parseAxeResults(results: any) {
+    return violations.map((violation: any) => {
 
-    return results.violations.map((violation: any) => {
-
-        const wcag = getWCAGCriterion(violation.id);
+        const wcag = getWCAGCriteria(violation.id);
 
         return {
 
@@ -17,7 +16,7 @@ export function parseAxeResults(results: any) {
 
             impact: violation.impact,
 
-            wcag: wcag,
+            wcag,
 
             affectedElements: violation.nodes.map((node: any) => ({
                 html: node.html,

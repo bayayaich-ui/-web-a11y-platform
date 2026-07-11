@@ -1,16 +1,12 @@
-import wcagCriteria from "../data/wcag-criteria.json";
+import wcagCriteria from "../data/wcag-2.2-criteria.json";
 
 
-export function getWCAGCriterion(ruleId:string){
+export function getWCAGCriteria(ruleId: string) {
 
-
-    const criterion = wcagCriteria.find((item:any)=>
-
+    const criteria = wcagCriteria.filter((item: any) =>
         item.axe_core_rules.includes(ruleId)
-
     );
 
-
-    return criterion || null;
+    return criteria;
 
 }
