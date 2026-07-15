@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "turbo": "^2.10.3"
   },
@@ -15,9 +15,5 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ],
-  "directories": {
-    "doc": "docs"
-  },
-  "description": ""
+  ]
 }
