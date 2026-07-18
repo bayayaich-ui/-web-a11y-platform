@@ -23,6 +23,9 @@ jobs:
       - name: Installer les dépendances
         run: npm install
 
+      - name: Installer les navigateurs Playwright
+        run: npx playwright install --with-deps chromium
+
       - name: Builder tous les services
         run: npx turbo build
 
@@ -31,5 +34,6 @@ jobs:
 
       - name: Lancer les tests
         run: npx turbo test --continue
+
       - name: Build Docker scanner-service
         run: docker build -f infra/docker/Dockerfile.scanner-service -t scanner-service .
