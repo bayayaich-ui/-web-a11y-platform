@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run",
+    "run:test": "tsx src/diagnostic/test.ts"
   },
   "keywords": [],
   "author": "",

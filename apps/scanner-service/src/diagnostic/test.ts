@@ -1,8 +1,9 @@
 import 'dotenv/config';
 import { DiagnosticService } from './diagnostic-service';
+import { ViolationBrute } from './types';
 
 
-const violation = {
+const violation: ViolationBrute = {
   rule: "image-alt",
   impact: "critical",
   element: "<img src='logo.png'>",

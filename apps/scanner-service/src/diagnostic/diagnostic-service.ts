@@ -9,7 +9,7 @@ export class DiagnosticService {
     const genAI = new GoogleGenerativeAI(apiKey);
 
     this.model = genAI.getGenerativeModel({
-      model: "gemini-2.5-pro",
+      model: "gemini-3.1-flash-lite",
     });
   }
 
@@ -28,17 +28,30 @@ Retourne uniquement un JSON valide.
 `;
 
     const result = await this.model.generateContent(prompt);
-
     const response = result.response.text();
 
-
     if (!response) {
-      throw new Error(
-        "Réponse Gemini vide"
-      );
+      throw new Error("Réponse Gemini vide");
     }
 
+    return this.parseJsonResponse(response);
+  }
 
-    return JSON.parse(response) as DiagnosticResponse;
+  private parseJsonResponse(response: string): DiagnosticResponse {
+    // Gemini entoure parfois sa réponse de balises markdown (```json ... ```)
+    // malgré la consigne — on les retire avant de parser, sinon JSON.parse plante
+    const cleaned = response
+      .trim()
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/```\s*$/i, "");
+
+    try {
+      return JSON.parse(cleaned) as DiagnosticResponse;
+    } catch (error) {
+      throw new Error(
+        `Réponse Gemini non parsable en JSON : ${cleaned.slice(0, 200)}...`
+      );
+    }
   }
 }
