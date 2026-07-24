@@ -122,4 +122,11 @@ Deux files, un sens de circulation par file. Ni le Backend ni le Scanner ne s'ap
 
 ---
 
+### Priorité calculée (ajoutée après diagnostic)
+
+| Champ      | Type   | Description                                                                                                                           |
+| ---------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `priority` | string | `"bloquant"` \| `"majeur"` \| `"mineur"` — priorité combinée (le plus sévère entre l'impact axe-core et la severite jugée par le LLM) |
+
+Le tableau de violations d'une page est trié par priorité croissante (bloquant en premier).
 _Ce document doit être mis à jour et communiqué aux deux parties avant tout changement de schéma._
