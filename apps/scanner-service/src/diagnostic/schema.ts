@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const DiagnosticSchema = z.object({
   titre: z.string().min(1, "Le titre ne peut pas être vide"),
   severite: z.enum(['Critique', 'Majeur', 'Mineur', 'Info'], {
-    errorMap: () => ({ message: "severite doit être 'Critique', 'Majeur', 'Mineur' ou 'Info'" }),
+    error: "severite doit être 'Critique', 'Majeur', 'Mineur' ou 'Info'",
   }),
   explication_simple: z.string().min(1, "L'explication ne peut pas être vide"),
   impact_utilisateur: z.string().min(1, "L'impact utilisateur ne peut pas être vide"),
