@@ -1,4 +1,3 @@
-
 export interface ViolationBrute {
   rule: string;
   impact: 'critical' | 'serious' | 'moderate' | 'minor';

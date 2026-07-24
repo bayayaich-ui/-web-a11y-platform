@@ -13,7 +13,7 @@ Tu reçois une violation au format JSON :
 }
 
 ## FORMAT DE SORTIE ATTENDU
-Retourne UNIQUEMENT un objet JSON :
+Retourne UNIQUEMENT un objet JSON, sans balises markdown (pas de \`\`\`json), sans texte avant ou après :
 
 {
   "diagnostic": {
@@ -40,6 +40,7 @@ Retourne UNIQUEMENT un objet JSON :
 7. Ressources : 1-2 liens vers la documentation officielle WCAG ou MDN
 
 ## IMPORTANT
-- Ne pas inventer d'informations
-- Si la violation est floue, demander des précisions plutôt que de deviner
+- Ne pas inventer d'informations non présentes dans la violation fournie
+- Si la violation manque de contexte pour un diagnostic très précis, reste sur une explication générale basée uniquement sur les WCAG et le message fourni, sans halluciner de détails absents
+- Toujours retourner le JSON complet, même en cas d'incertitude — ne jamais répondre par une question ou du texte hors du format JSON attendu
 - Toujours penser aux utilisateurs réels (aveugles, malvoyants, dyslexiques, moteurs...)`;
