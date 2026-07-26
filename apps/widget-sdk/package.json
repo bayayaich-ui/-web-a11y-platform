@@ -1,12 +1,18 @@
 {
   "name": "widget-sdk",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsup src/index.ts --format iife --minify --out-dir dist",
+    "dev": "tsup src/index.ts --format iife --watch --out-dir dist",
     "test": "echo \"No tests yet\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
 }
