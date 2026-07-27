@@ -5,7 +5,8 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
-    JSON
+    JSON, 
+    Numeric,
 )
 
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
@@ -100,6 +101,17 @@ class Scan(Base):
     started_at = Column(DateTime)
 
     finished_at = Column(DateTime)
+    max_depth = Column(Integer)
+    pages_scanned = Column(Integer, default=0)
+    score_global = Column(Numeric(5, 2))
+    score_perceivable = Column(Numeric(5, 2))
+    score_operable = Column(Numeric(5, 2))
+    score_understandable = Column(Numeric(5, 2))
+    score_robust = Column(Numeric(5, 2))
+    violations_critical = Column(Integer, default=0)
+    violations_serious = Column(Integer, default=0)
+    violations_moderate = Column(Integer, default=0)
+    violations_minor = Column(Integer, default=0)
 
 
     site = relationship(
@@ -176,6 +188,10 @@ class Violation(Base):
     impact = Column(Text)
 
     selector = Column(Text)
+    element = Column(Text)
+    message = Column(Text)
+    priority = Column(Text)
+    diagnostic = Column(JSON)
 
     details = Column(
         JSON
