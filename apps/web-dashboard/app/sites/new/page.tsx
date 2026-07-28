@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSite } from '../../../lib/api';
+import Button from '../../../components/Button';
+import Input from '../../../components/Input';
 
 export default function NewSitePage() {
   const router = useRouter();
@@ -50,59 +52,40 @@ export default function NewSitePage() {
       </p>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-border p-6 flex flex-col gap-5">
-        <div>
-          <label htmlFor="site-name" className="block text-sm font-medium mb-1">
-            Nom du site
-          </label>
-          <input
-            id="site-name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Ex : Site vitrine client A"
-            required
-            className="w-full px-3 py-2 rounded border border-border focus-visible:outline-brand"
-          />
-        </div>
+        <Input
+          id="site-name"
+          label="Nom du site"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Ex : Site vitrine client A"
+          required
+        />
 
-        <div>
-          <label htmlFor="site-url" className="block text-sm font-medium mb-1">
-            URL du site
-          </label>
-          <input
-            id="site-url"
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://monsite.com"
-            required
-            aria-describedby={erreur ? 'site-url-erreur' : undefined}
-            aria-invalid={!!erreur}
-            className="w-full px-3 py-2 rounded border border-border font-mono text-sm focus-visible:outline-brand"
-          />
-        </div>
+        <Input
+          id="site-url"
+          label="URL du site"
+          type="url"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://monsite.com"
+          required
+          aria-describedby={erreur ? 'site-url-erreur' : undefined}
+          aria-invalid={!!erreur}
+        />
 
         {erreur && (
-          <p id="site-url-erreur" role="alert" className="text-bloquant text-sm">
+          <p id="site-url-erreur" role="alert" className="text-[var(--color-danger)] text-sm" aria-live="assertive">
             {erreur}
           </p>
         )}
 
         <div className="flex gap-3 justify-end">
-          <button
-            type="button"
-            onClick={() => router.push('/sites')}
-            className="px-4 py-2 rounded border border-border font-medium"
-          >
+          <Button variant="secondary" type="button" onClick={() => router.push('/sites')}>
             Annuler
-          </button>
-          <button
-            type="submit"
-            disabled={enCours}
-            className="px-4 py-2 rounded bg-brand text-white font-medium disabled:opacity-50"
-          >
+          </Button>
+          <Button variant="primary" type="submit" disabled={enCours}>
             {enCours ? 'Ajout en cours…' : 'Ajouter et lancer le scan'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

@@ -15,11 +15,10 @@ export default async function SitesPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-2xl font-bold">Vos sites</h1>
-        <Link
-          href="/sites/new"
-          className="px-4 py-2 rounded bg-brand text-white font-medium hover:bg-brand/90"
-        >
-          + Ajouter un site
+        <Link href="/sites/new">
+          <button className="px-4 py-2 rounded bg-[var(--color-primary)] text-[var(--color-primary-contrast)] font-medium hover:opacity-95 focus-ring min-touch">
+            + Ajouter un site
+          </button>
         </Link>
       </div>
 
@@ -55,9 +54,13 @@ export default async function SitesPage() {
                   {site.last_scan_date ? new Date(site.last_scan_date).toLocaleDateString('fr-FR') : '—'}
                 </td>
                 <td className="px-4 py-4 text-right">
-                  <Link href={`/scans/${site.id}`} className="text-brand font-medium hover:underline">
-                    Voir le détail →
-                  </Link>
+                  {site.last_scan_id ? (
+                    <Link href={`/scans/${site.last_scan_id}`} className="text-[var(--color-primary)] font-medium hover:underline">
+                      Voir le détail →
+                    </Link>
+                  ) : (
+                    <span className="text-mineur text-sm">Aucun scan disponible</span>
+                  )}
                 </td>
               </tr>
             ))}

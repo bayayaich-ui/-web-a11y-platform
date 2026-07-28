@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import './load-env';
 import { connectQueue, closeQueue } from './queue-consumer/rabbitmq-connection';
 import { startConsuming, ScanJob } from './queue-consumer/job-handler';
 import { publishPageResult } from './queue-consumer/result-publisher';
@@ -26,16 +26,14 @@ function toViolationBrute(axeViolation: any): ViolationBrute {
   };
 }
 
-async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: any) {
-  console.log(`Démarrage du scan ${job.scan_id} pour ${job.url}`);
-
-  const pages = await crawlSite(job.url, pool, {
-    maxDepth: job.max_depth,
-    maxPages: job.max_pages,
-  });
-
-  for (const crawledPage of pages) {
-    const { page, context } = await pool.acquirePage();
+async function processPage(
+  crawledPage: { url: string; title: string; depth: number },
+  job: ScanJob,
+  pool: BrowserPoolManager,
+  channel: any
+) {
+  const { page, context } = await pool.acquirePage();
+  try {
     await page.goto(crawledPage.url);
 
     // 1. Détection des violations avec axe-core
@@ -52,7 +50,6 @@ async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: a
         violationsAvecDiagnostic.push({ violation: violationBrute, diagnostic });
       } catch (error) {
         console.error(`Diagnostic IA échoué pour la règle ${violationBrute.rule}:`, error);
-        // On continue le scan même si UNE violation échoue, plutôt que de tout bloquer
       }
     }
 
@@ -72,8 +69,46 @@ async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: a
     });
 
     console.log(`Page ${crawledPage.url} : ${violationsTriees.length} violations diagnostiquées`);
-
+  } catch (error) {
+    console.error(`Erreur lors du traitement de la page ${crawledPage.url}:`, error);
+  } finally {
     await pool.releasePage(context);
+  }
+}
+
+async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: any) {
+  console.log(`Démarrage du scan ${job.scan_id} pour ${job.url}`);
+
+  const pages = await crawlSite(job.url, pool, {
+    maxDepth: job.max_depth,
+    maxPages: job.max_pages,
+  });
+
+  const concurrency = pool.concurrency;
+  const tasks: Promise<void>[] = [];
+
+  for (const crawledPage of pages) {
+    const task = processPage(crawledPage, job, pool, channel);
+    tasks.push(task);
+
+    if (tasks.length >= concurrency) {
+      const results = await Promise.allSettled(tasks);
+      results.forEach((result) => {
+        if (result.status === 'rejected') {
+          console.error('Erreur de page parallèle :', result.reason);
+        }
+      });
+      tasks.length = 0;
+    }
+  }
+
+  if (tasks.length > 0) {
+    const results = await Promise.allSettled(tasks);
+    results.forEach((result) => {
+      if (result.status === 'rejected') {
+        console.error('Erreur de page parallèle :', result.reason);
+      }
+    });
   }
 
   console.log(`Scan ${job.scan_id} terminé : ${pages.length} pages traitées`);

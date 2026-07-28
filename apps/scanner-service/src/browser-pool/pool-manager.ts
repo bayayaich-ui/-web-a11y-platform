@@ -9,6 +9,10 @@ export class BrowserPoolManager {
     this.maxContexts = maxContexts;
   }
 
+  get concurrency(): number {
+    return this.maxContexts;
+  }
+
   // Démarre l'instance de navigateur partagée (une seule pour tout le pool)
   async initialize(): Promise<void> {
     if (this.browser) return; // déjà démarré, on ne relance pas
@@ -30,8 +34,13 @@ export class BrowserPoolManager {
 
     // Un "context" isole les cookies/sessions entre deux scans différents,
     // même si le navigateur physique est partagé
-    const context = await this.browser.newContext();
+    const context = await this.browser.newContext({
+      ignoreHTTPSErrors: true,
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    });
     const page = await context.newPage();
+    // augmenter le timeout par défaut pour les navigations
+    page.setDefaultNavigationTimeout(30000);
     this.activeContexts++;
 
     return { page, context };
