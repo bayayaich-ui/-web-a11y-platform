@@ -1,12 +1,10 @@
 export interface ViolationBrute {
-    rule: string;
-    html: string;
-    impact: string;
-    description: string;
+  rule: string;
+  html: string;
+  impact: string;
+  description: string;
 }
 
-export type Correctif = z.infer<typeof CorrectifSchema>;
-// ou si tu préfères une interface manuelle :
 export interface Correctif {
   rule: string;
   code_original: string;

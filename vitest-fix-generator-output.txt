@@ -1,0 +1,262 @@
+﻿
+ RUN  v4.1.9 C:/Users/21624/web-a11y-platform/apps/scanner-service
+
+node.exe : stderr | src/fix-generator/fix-generator.test.ts > FixGenerator > 
+devrait rejeter un JSON non parsable
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\21624\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (stderr | src/fi...ON non parsable 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Tentative 1/3 ├⌐chou├⌐e: FixParsingError: R├⌐ponse Gemini non parsable en JSON 
+: Ceci n'est pas du JSON...
+    at FixGenerator.parseAndValidate (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:67:13)
+    at FixGenerator.genererCorrectif (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:44:21)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  rawResponse: "Ceci n'est pas du JSON"
+}
+
+stderr | src/fix-generator/fix-generator.test.ts > FixGenerator > devrait 
+rejeter un JSON non parsable
+Tentative 2/3 ├⌐chou├⌐e: FixParsingError: R├⌐ponse Gemini non parsable en JSON 
+: Ceci n'est pas du JSON...
+    at FixGenerator.parseAndValidate (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:67:13)
+    at FixGenerator.genererCorrectif (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:44:21)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at C:/Users/21624/web-a11y-platform/apps/scanner-service/src/fix-generator/
+fix-generator.test.ts:78:5
+    at file:///C:/Users/21624/web-a11y-platform/node_modules/@vitest/runner/dis
+t/chunk-artifact.js:1903:20 {
+  rawResponse: "Ceci n'est pas du JSON"
+}
+
+stderr | src/fix-generator/fix-generator.test.ts > FixGenerator > devrait 
+rejeter un JSON non parsable
+Tentative 3/3 ├⌐chou├⌐e: FixParsingError: R├⌐ponse Gemini non parsable en JSON 
+: Ceci n'est pas du JSON...
+    at FixGenerator.parseAndValidate (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:67:13)
+    at FixGenerator.genererCorrectif (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:44:21)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at C:/Users/21624/web-a11y-platform/apps/scanner-service/src/fix-generator/
+fix-generator.test.ts:78:5
+    at file:///C:/Users/21624/web-a11y-platform/node_modules/@vitest/runner/dis
+t/chunk-artifact.js:1903:20 {
+  rawResponse: "Ceci n'est pas du JSON"
+}
+
+stderr | src/fix-generator/fix-generator.test.ts > FixGenerator > devrait 
+rejeter un sch├⌐ma de r├⌐ponse invalide
+Tentative 1/3 ├⌐chou├⌐e: FixParsingError: R├⌐ponse Gemini invalide : [
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "code_original"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "code_corrige"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "explication"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "code": "invalid_value",
+    "values": [
+      "automatique",
+      "manuel"
+    ],
+    "path": [
+      "correctif",
+      "type_correctif"
+    ],
+    "message": "type_correctif doit ├¬tre 'automatique' ou 'manuel'"
+  }
+]
+    at FixGenerator.parseAndValidate (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:75:13)
+    at FixGenerator.genererCorrectif (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:44:21)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  rawResponse: '{"correctif":{"rule":"image-alt"}}'
+}
+
+stderr | src/fix-generator/fix-generator.test.ts > FixGenerator > devrait 
+rejeter un sch├⌐ma de r├⌐ponse invalide
+Tentative 2/3 ├⌐chou├⌐e: FixParsingError: R├⌐ponse Gemini invalide : [
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "code_original"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "code_corrige"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "explication"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "code": "invalid_value",
+    "values": [
+      "automatique",
+      "manuel"
+    ],
+    "path": [
+      "correctif",
+      "type_correctif"
+    ],
+    "message": "type_correctif doit ├¬tre 'automatique' ou 'manuel'"
+  }
+]
+    at FixGenerator.parseAndValidate (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:75:13)
+    at FixGenerator.genererCorrectif (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:44:21)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at C:/Users/21624/web-a11y-platform/apps/scanner-service/src/fix-generator/
+fix-generator.test.ts:91:5
+    at file:///C:/Users/21624/web-a11y-platform/node_modules/@vitest/runner/dis
+t/chunk-artifact.js:1903:20 {
+  rawResponse: '{"correctif":{"rule":"image-alt"}}'
+}
+
+stderr | src/fix-generator/fix-generator.test.ts > FixGenerator > devrait 
+rejeter un sch├⌐ma de r├⌐ponse invalide
+Tentative 3/3 ├⌐chou├⌐e: FixParsingError: R├⌐ponse Gemini invalide : [
+  {
+    "expected": "string",
+stdout | src/fix-generator/fix-generator.test.ts
+Γùç injected env (7) from ..\..\.env // tip: Γîü auth for agents [www.vestauth.com]
+
+ Γ¥» src/fix-generator/fix-generator.test.ts (5 tests | 2 failed) 20ms
+     ├ù devrait rejeter un JSON non parsable 9ms
+     ├ù devrait rejeter un sch├⌐ma de r├⌐ponse invalide 3ms
+
+ Test Files  1 failed (1)
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "code_original"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "code_corrige"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "correctif",
+      "explication"
+    ],
+    "message": "Invalid input: expected string, received undefined"
+  },
+  {
+    "code": "invalid_value",
+    "values": [
+      "automatique",
+      "manuel"
+    ],
+    "path": [
+      "correctif",
+      "type_correctif"
+    ],
+    "message": "type_correctif doit ├¬tre 'automatique' ou 'manuel'"
+  }
+]
+    at FixGenerator.parseAndValidate (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:75:13)
+    at FixGenerator.genererCorrectif (C:/Users/21624/web-a11y-platform/apps/sca
+nner-service/src/fix-generator/fix-generator.ts:44:21)
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at C:/Users/21624/web-a11y-platform/apps/scanner-service/src/fix-generator/
+fix-generator.test.ts:91:5
+    at file:///C:/Users/21624/web-a11y-platform/node_modules/@vitest/runner/dis
+t/chunk-artifact.js:1903:20 {
+  rawResponse: '{"correctif":{"rule":"image-alt"}}'
+}
+
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ» Failed Tests 2 ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»
+
+ FAIL  src/fix-generator/fix-generator.test.ts > FixGenerator > devrait 
+rejeter un JSON non parsable
+AssertionError: expected Error: ├ëchec de la g├⌐n├⌐ration du correctiΓÇª to be 
+an instance of FixParsingError
+ Γ¥» src/fix-generator/fix-generator.test.ts:78:56
+     76|     });
+     77|
+     78|     await 
+expect(generator.genererCorrectif(violation)).rejects.toBeInΓÇª
+       |                                                        ^
+     79|   });
+     80|
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1/2]ΓÄ
+»
+
+ FAIL  src/fix-generator/fix-generator.test.ts > FixGenerator > devrait 
+rejeter un sch├⌐ma de r├⌐ponse invalide
+AssertionError: expected Error: ├ëchec de la g├⌐n├⌐ration du correctiΓÇª to be 
+an instance of FixParsingError
+ Γ¥» src/fix-generator/fix-generator.test.ts:91:56
+     89|     });
+     90|
+     91|     await 
+expect(generator.genererCorrectif(violation)).rejects.toBeInΓÇª
+      Tests  2 failed | 3 passed (5)
+   Start at  12:20:09
+   Duration  518ms (transform 70ms, setup 45ms, import 178ms, tests 20ms, environment 0ms)
+
+       |                                                        ^
+     92|   });
+     93|
+
+ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[2/2]ΓÄ
+»
+

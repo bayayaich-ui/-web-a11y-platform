@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: #F5F6F8;
+  color: #101418;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Focus clavier visible partout — non négociable pour un outil d'accessibilité */
+:focus-visible {
+  outline: 2px solid #1F4B99;
+  outline-offset: 2px;
+}
+
+/* Design system variables */
+:root {
+  --color-bg: #F5F6F8;
+  --color-surface: #FFFFFF;
+  --color-ink: #0F1720;
+  --color-primary: #1F4B99; /* blue */
+  --color-primary-contrast: #FFFFFF;
+  --color-muted: #6B7280;
+  --color-success: #047857;
+  --color-danger: #B91C1C;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
+}
+
+/* Utility: accessible focus ring */
+.focus-ring:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+/* Ensure interactive targets are at least 44x44px */
+.min-touch {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

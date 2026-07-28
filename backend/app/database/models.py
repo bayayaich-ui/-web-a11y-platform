@@ -96,11 +96,18 @@ class Scan(Base):
     )
 
     max_pages = Column(Integer)
+    max_depth = Column(Integer)
+
+    pages_scanned = Column(Integer, default=0)
+    score_global = Column(Integer)
+
+    violations_critical = Column(Integer, default=0)
+    violations_serious = Column(Integer, default=0)
+    violations_moderate = Column(Integer, default=0)
+    violations_minor = Column(Integer, default=0)
 
     started_at = Column(DateTime)
-
     finished_at = Column(DateTime)
-
 
     site = relationship(
         "Site",
@@ -175,7 +182,11 @@ class Violation(Base):
 
     impact = Column(Text)
 
-    selector = Column(Text)
+    element = Column(Text)
+    message = Column(Text)
+    
+    priority = Column(Text)
+    diagnostic = Column(JSON)
 
     details = Column(
         JSON
@@ -185,7 +196,6 @@ class Violation(Base):
         DateTime,
         default=datetime.utcnow
     )
-
 
     page = relationship(
         "Page",

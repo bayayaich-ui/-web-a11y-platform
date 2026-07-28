@@ -10,6 +10,28 @@ export interface CrawlResult {
   depth: number;
 }
 
+function isHtmlMimeType(contentType: string | null | undefined): boolean {
+  return Boolean(contentType && contentType.toLowerCase().includes('text/html'));
+}
+
+function shouldSkipUrl(url: string): boolean {
+  const skipExtensions = [
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.zip', '.rar', '.7z',
+    '.png', '.jpg', '.jpeg', '.gif', '.svg', '.mp3', '.mp4', '.avi', '.mov',
+  ];
+
+  const lowerUrl = url.toLowerCase();
+  if (skipExtensions.some((ext) => lowerUrl.includes(ext))) {
+    return true;
+  }
+
+  if (/\b(url|download|file|attachment)=/i.test(url)) {
+    return true;
+  }
+
+  return false;
+}
+
 export async function crawlSite(
   startUrl: string,
   pool: BrowserPoolManager,
@@ -25,8 +47,10 @@ export async function crawlSite(
 
   // 2. Essayer le sitemap (celui déclaré dans robots.txt, sinon l'emplacement standard)
   const sitemapUrls = robots.sitemapUrls.length > 0
-    ? robots.sitemapUrls.flatMap(() => [] as string[]) // à étendre si plusieurs sitemaps
+    ? robots.sitemapUrls
     : await readSitemap(startUrl, page);
+
+  console.log(`Crawler: robots rules disallowed=${robots.disallowedPaths.length} sitemapUrls=${sitemapUrls.length}`);
 
   if (sitemapUrls.length > 0) {
     sitemapUrls
@@ -41,10 +65,25 @@ export async function crawlSite(
     const current = queue.next();
     if (!current) break;
 
-    try {
-      await page.goto(current.url, { waitUntil: 'networkidle', timeout: 10000 });
-      const title = await page.title();
+    if (shouldSkipUrl(current.url)) {
+      console.warn(`URL ignorée par le crawler (ressource non-HTML ou téléchargement probable) : ${current.url}`);
+      continue;
+    }
 
+    try {
+      const response = await page.goto(current.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+      if (!response) {
+        console.warn(`Aucune réponse reçue pour ${current.url}, page ignorée.`);
+        continue;
+      }
+
+      const contentType = response.headers()['content-type'];
+      if (!isHtmlMimeType(contentType)) {
+        console.warn(`Contenu non HTML détecté pour ${current.url} (${contentType}), page ignorée.`);
+        continue;
+      }
+
+      const title = await page.title();
       results.push({ url: current.url, title, depth: current.depth });
 
       const links = await extractInternalLinks(page, startUrl);

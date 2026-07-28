@@ -10,7 +10,10 @@ export async function readRobotsTxt(baseUrl: string, page: Page): Promise<Robots
   const rules: RobotsRules = { disallowedPaths: [], sitemapUrls: [] };
 
   try {
-    const response = await page.goto(robotsUrl, { timeout: 5000 });
+    const response = await page.goto(robotsUrl, {
+      timeout: 20000,
+      waitUntil: 'domcontentloaded',
+    });
 
     if (!response || response.status() !== 200) {
       return rules; // Pas de robots.txt : aucune restriction connue
@@ -39,7 +42,8 @@ export async function readRobotsTxt(baseUrl: string, page: Page): Promise<Robots
     }
 
     return rules;
-  } catch {
+  } catch (error) {
+    console.warn(`robots-reader: impossible de lire ${robotsUrl} :`, error);
     return rules;
   }
 }

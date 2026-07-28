@@ -4,7 +4,10 @@ export async function readSitemap(baseUrl: string, page: Page): Promise<string[]
   const sitemapUrl = new URL('/sitemap.xml', baseUrl).toString();
 
   try {
-    const response = await page.goto(sitemapUrl, { timeout: 5000 });
+    const response = await page.goto(sitemapUrl, {
+      timeout: 20000,
+      waitUntil: 'domcontentloaded',
+    });
 
     if (!response || response.status() !== 200) {
       return []; // Pas de sitemap, ce n'est pas une erreur bloquante
