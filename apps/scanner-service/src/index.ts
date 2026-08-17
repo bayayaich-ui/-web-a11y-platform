@@ -1,7 +1,7 @@
 import './load-env';
 import { connectQueue, closeQueue } from './queue-consumer/rabbitmq-connection';
 import { startConsuming, ScanJob } from './queue-consumer/job-handler';
-import { publishPageResult } from './queue-consumer/result-publisher';
+import { publishPageResult, publishScanCompleted } from './queue-consumer/result-publisher';
 import { BrowserPoolManager } from './browser-pool/pool-manager';
 import { crawlSite } from './crawler/crawler';
 import { captureAndStoreScreenshot } from './screenshot/screenshot-service';
@@ -11,7 +11,9 @@ import { DiagnosticService } from './diagnostic/diagnostic-service';
 import { prioriserViolations, ViolationAvecDiagnostic } from './diagnostic/prioritization';
 import { ViolationBrute } from './diagnostic/types';
 
-const diagnosticService = new DiagnosticService(process.env.GEMINI_API_KEY!);
+const diagnosticService = process.env.GEMINI_API_KEY?.trim()
+  ? new DiagnosticService(process.env.GEMINI_API_KEY)
+  : null;
 
 // Transforme le format retourné par axe-runner/parser en format attendu par le diagnostic IA
 function toViolationBrute(axeViolation: any): ViolationBrute {
@@ -26,6 +28,66 @@ function toViolationBrute(axeViolation: any): ViolationBrute {
   };
 }
 
+export async function processViolationsWithDiagnostics(
+  violationsBrutes: ReturnType<typeof parseAxeResults>,
+  service: Pick<DiagnosticService, 'genererDiagnostic'> | null | undefined,
+  logger: Pick<typeof console, 'log' | 'warn' | 'error'> = console,
+): Promise<ViolationAvecDiagnostic[]> {
+  const violationsAvecDiagnostic: ViolationAvecDiagnostic[] = [];
+  let diagnosticsReussis = 0;
+  let diagnosticsEchoues = 0;
+
+  logger.log(`[SCAN] Violations Axe détectées: ${violationsBrutes.length}`);
+
+  for (const axeViolation of violationsBrutes) {
+    const violationBrute = toViolationBrute(axeViolation);
+    const violationItem: ViolationAvecDiagnostic = {
+      violation: violationBrute,
+      diagnostic: {
+        titre: 'Diagnostic IA indisponible',
+        severite: 'Info',
+        explication_simple: 'Le diagnostic IA n\'a pas pu être généré pour cette violation.',
+        impact_utilisateur: 'Le diagnostic détaillé n\'est pas disponible pour cette violation.',
+        recommandation: 'Réessayez le diagnostic d\'accessibilité plus tard ou vérifiez la violation brute.',
+        code_corrige: '',
+        ressources: [],
+      },
+    };
+
+    logger.log(`[VIOLATION] Traitement de la violation: ${violationBrute.rule}`);
+    if (!service) {
+      logger.warn('[AI] Diagnostic IA indisponible: service non configuré');
+      diagnosticsEchoues += 1;
+      violationsAvecDiagnostic.push(violationItem);
+      logger.log('[VIOLATION] Violation conservée');
+      continue;
+    }
+
+    logger.log('[AI] Génération du diagnostic...');
+
+    try {
+      const { diagnostic } = await service.genererDiagnostic(violationBrute);
+      violationItem.diagnostic = diagnostic;
+      diagnosticsReussis += 1;
+      logger.log('[AI] Diagnostic réussi');
+    } catch (error) {
+      diagnosticsEchoues += 1;
+      logger.error(`[AI] Échec du diagnostic IA pour ${violationBrute.rule}:`, error);
+      logger.warn('[AI] Violation conservée malgré l\'échec du diagnostic');
+    }
+
+    violationsAvecDiagnostic.push(violationItem);
+    logger.log('[VIOLATION] Violation conservée');
+  }
+
+  logger.log(`[SCAN] Violations Axe: ${violationsBrutes.length}`);
+  logger.log(`[SCAN] Violations finales: ${violationsAvecDiagnostic.length}`);
+  logger.log(`[SCAN] Diagnostics IA réussis: ${diagnosticsReussis}`);
+  logger.log(`[SCAN] Diagnostics IA échoués: ${diagnosticsEchoues}`);
+
+  return violationsAvecDiagnostic;
+}
+
 async function processPage(
   crawledPage: { url: string; title: string; depth: number },
   job: ScanJob,
@@ -34,27 +96,33 @@ async function processPage(
 ) {
   const { page, context } = await pool.acquirePage();
   try {
-    await page.goto(crawledPage.url);
+    await page.goto(crawledPage.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // 1. Détection des violations avec axe-core
     const axeResults = await runAxeScan(page);
-    const violationsBrutes = parseAxeResults(axeResults.violations);
+    const violationsBrutes = parseAxeResults(axeResults?.violations ?? []);
 
-    // 2. Diagnostic IA (une fois par règle détectée sur la page, pas par élément affecté,
-    //    pour économiser le quota gratuit de l'API)
-    const violationsAvecDiagnostic: ViolationAvecDiagnostic[] = [];
-    for (const axeViolation of violationsBrutes) {
-      const violationBrute = toViolationBrute(axeViolation);
-      try {
-        const { diagnostic } = await diagnosticService.genererDiagnostic(violationBrute);
-        violationsAvecDiagnostic.push({ violation: violationBrute, diagnostic });
-      } catch (error) {
-        console.error(`Diagnostic IA échoué pour la règle ${violationBrute.rule}:`, error);
-      }
+    if (!Array.isArray(axeResults?.violations)) {
+      throw new Error(`Axe n'a renvoyé aucun résultat exploitable pour ${crawledPage.url}`);
     }
+
+    console.log(`[SCAN] URL: ${crawledPage.url}`);
+    console.log(`[SCAN] Page loaded`);
+    console.log(`[SCAN] Scanner started`);
+    console.log(`[SCAN] Raw violations detected: ${axeResults.violations.length}`);
+    console.log(`[SCAN] Parsed violations: ${violationsBrutes.length}`);
+
+    // 2. Diagnostic IA séparé de la détection des violations : on conserve la violation
+    //    même si le LLM échoue.
+    const violationsAvecDiagnostic = await processViolationsWithDiagnostics(
+      violationsBrutes,
+      diagnosticService,
+      console,
+    );
 
     // 3. Calcul de la priorité (croisement axe-core + LLM) et tri
     const violationsTriees = prioriserViolations(violationsAvecDiagnostic);
+    console.log(`[SCAN] Final violations: ${violationsTriees.length}`);
 
     // 4. Capture et upload du screenshot
     const screenshotResult = await captureAndStoreScreenshot(page, job.scan_id, crawledPage.url);
@@ -82,6 +150,7 @@ async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: a
   const pages = await crawlSite(job.url, pool, {
     maxDepth: job.max_depth,
     maxPages: job.max_pages,
+    scanMode: job.scan_mode ?? 'single_page',
   });
 
   const concurrency = pool.concurrency;
@@ -112,6 +181,15 @@ async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: a
   }
 
   console.log(`Scan ${job.scan_id} terminé : ${pages.length} pages traitées`);
+  try {
+    publishScanCompleted(channel, {
+      scan_id: job.scan_id,
+      pages_processed: pages.length,
+      finished_at: new Date().toISOString(),
+    });
+  } catch (e) {
+    console.error('Impossible de publier scan.completed:', e);
+  }
 }
 
 async function main() {
@@ -121,6 +199,13 @@ async function main() {
   const channel = await connectQueue();
 
   await startConsuming(channel, (job) => processScanJob(job, pool, channel));
+  // start on-demand analysis consumer
+  try {
+    const { startAnalyzeConsumer } = await import('./queue-consumer/analyze-handler');
+    await startAnalyzeConsumer(channel as any);
+  } catch (e) {
+    console.warn('Impossible de démarrer le consumer d\'analyse à la demande :', e);
+  }
 
   console.log('Scanner en écoute sur la file scan.jobs...');
 }

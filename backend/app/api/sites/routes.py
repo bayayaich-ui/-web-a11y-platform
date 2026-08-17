@@ -7,6 +7,9 @@ from app.database.database import get_db
 from app.database.models import Site, Scan, User
 from app.schemas.site import SiteCreate, SiteResponse
 from app.services.queue_publisher import publish_scan_job
+from app.schemas.site import ScanCreate
+from fastapi import HTTPException
+from uuid import UUID as UUIDType
 
 router = APIRouter(prefix="/api/sites", tags=["sites"])
 
@@ -59,13 +62,14 @@ async def create_site(payload: SiteCreate, db: Session = Depends(get_db)):
     db.flush()
 
     # Créer immédiatement un scan "pending" et déclencher le job —
-    # cohérent avec la description du dashboard : "le premier scan
-    # démarre automatiquement une fois le site enregistré"
+    # si le mode demandé est single_page, limiter max_pages à 1
+    scan_mode = getattr(payload, 'scan_mode', 'single_page')
+    default_max = 1 if scan_mode == 'single_page' else 50
     scan = Scan(
         id=uuid4(),
         site_id=site.id,
-        status="pending",
-        max_pages=50,
+        status="running",
+        max_pages=default_max,
         max_depth=3,
         started_at=datetime.utcnow(),
     )
@@ -73,7 +77,9 @@ async def create_site(payload: SiteCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(site)
 
-    await publish_scan_job(str(scan.id), str(site.id), site.url, max_pages=50, max_depth=3)
+    # Transmettre le mode de scan (par défaut 'single_page' pour accélérer les tests)
+    scan_mode = getattr(payload, 'scan_mode', 'single_page')
+    await publish_scan_job(str(scan.id), str(site.id), site.url, max_pages=default_max, max_depth=3, scan_mode=scan_mode)
 
     return SiteResponse(
         id=site.id,
@@ -84,3 +90,43 @@ async def create_site(payload: SiteCreate, db: Session = Depends(get_db)):
         last_scan_date=None,
         last_scan_id=scan.id,
     )
+
+
+@router.post("/{site_id}/scan", status_code=201)
+async def trigger_scan(site_id: str, payload: ScanCreate, db: Session = Depends(get_db)):
+    # Validate site exists
+    try:
+        site_uuid = UUIDType(site_id)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Identifiant de site invalide")
+
+    site = db.query(Site).filter(Site.id == site_uuid).first()
+    if site is None:
+        raise HTTPException(status_code=404, detail="Site introuvable")
+
+    # Create scan row
+    scan_mode = payload.scan_mode or 'single_page'
+    max_pages = 1 if scan_mode == 'single_page' else (payload.max_pages or 50)
+    scan = Scan(
+        id=uuid4(),
+        site_id=site.id,
+        status="running",
+        max_pages=max_pages,
+        max_depth=payload.max_depth or 3,
+        started_at=datetime.utcnow(),
+    )
+    db.add(scan)
+    db.commit()
+    db.refresh(scan)
+
+    # Publish job with requested mode
+    await publish_scan_job(
+        str(scan.id),
+        str(site.id),
+        site.url,
+        max_pages=scan.max_pages or 50,
+        max_depth=scan.max_depth or 3,
+        scan_mode=scan_mode,
+    )
+
+    return {"scan_id": str(scan.id), "scan_mode": payload.scan_mode or 'single_page'}

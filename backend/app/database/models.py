@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import (
     Column,
     String,
@@ -5,7 +7,8 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
-    JSON
+    JSON,
+    TypeDecorator
 )
 
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
@@ -14,6 +17,47 @@ from datetime import datetime
 import uuid
 
 from app.database.database import Base
+
+
+class WcagCriteriaType(TypeDecorator):
+    """Store WCAG references in a dialect-safe way.
+
+    SQLite test tables are TEXT-backed and cannot bind Python lists to ARRAY(Text),
+    while PostgreSQL uses native arrays for the production schema. This adapter keeps
+    both behaviors compatible without dropping any validation data.
+    """
+
+    impl = Text
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return ARRAY(Text)
+        return Text()
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        if isinstance(value, (list, tuple)):
+            values = list(value)
+            if dialect.name == "sqlite":
+                return json.dumps(values)
+            return values
+        if isinstance(value, str):
+            return value
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        if isinstance(value, str):
+            try:
+                parsed = json.loads(value)
+                if isinstance(parsed, list):
+                    return parsed
+            except (TypeError, ValueError):
+                pass
+        return value
 
 
 class User(Base):
@@ -97,6 +141,7 @@ class Scan(Base):
 
     max_pages = Column(Integer)
     max_depth = Column(Integer)
+    scan_mode = Column(Text, default="single_page")
 
     pages_scanned = Column(Integer, default=0)
     score_global = Column(Integer)
@@ -177,7 +222,7 @@ class Violation(Base):
     rule = Column(Text)
 
     wcag_criteria = Column(
-        ARRAY(Text)
+        WcagCriteriaType()
     )
 
     impact = Column(Text)

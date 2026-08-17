@@ -17,3 +17,15 @@ export function publishPageResult(channel: Channel, result: PageResult): void {
     persistent: true,
   });
 }
+
+export interface ScanCompletedPayload {
+  scan_id: string;
+  pages_processed: number;
+  finished_at: string;
+}
+
+export function publishScanCompleted(channel: Channel, payload: ScanCompletedPayload): void {
+  const queue = 'scan.completed';
+  channel.assertQueue(queue, { durable: true }).catch(() => null);
+  channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)), { persistent: true });
+}

@@ -15,6 +15,11 @@ export class FixGenerator {
   private readonly maxRetries = 2;
 
   constructor(apiKey: string) {
+    if (!apiKey || !apiKey.trim()) {
+      this.model = null;
+      return;
+    }
+
     const genAI = new GoogleGenerativeAI(apiKey);
     this.model = genAI.getGenerativeModel({
       model: "gemini-3.1-flash-lite",
@@ -22,6 +27,9 @@ export class FixGenerator {
   }
 
   async genererCorrectif(violation: ViolationBrute): Promise<Correctif> {
+    if (!this.model) {
+      throw new Error('Gemini API key is missing or invalid. Fix generation unavailable.');
+    }
     const prompt = `
 ${FIX_SYSTEM_PROMPT}
 

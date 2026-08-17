@@ -14,7 +14,7 @@ function isHtmlMimeType(contentType: string | null | undefined): boolean {
   return Boolean(contentType && contentType.toLowerCase().includes('text/html'));
 }
 
-function shouldSkipUrl(url: string): boolean {
+export function shouldSkipUrl(url: string): boolean {
   const skipExtensions = [
     '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.zip', '.rar', '.7z',
     '.png', '.jpg', '.jpeg', '.gif', '.svg', '.mp3', '.mp4', '.avi', '.mov',
@@ -25,7 +25,9 @@ function shouldSkipUrl(url: string): boolean {
     return true;
   }
 
-  if (/\b(url|download|file|attachment)=/i.test(url)) {
+  // Only skip direct download/file patterns. A page like /index.php?url=contact
+  // is a valid HTML page and should not be treated as a downloadable resource.
+  if (/\b(?:download|file|attachment)=/i.test(url)) {
     return true;
   }
 
@@ -35,29 +37,36 @@ function shouldSkipUrl(url: string): boolean {
 export async function crawlSite(
   startUrl: string,
   pool: BrowserPoolManager,
-  options: { maxDepth?: number; maxPages?: number } = {}
+  options: { maxDepth?: number; maxPages?: number; scanMode?: 'single_page' | 'full_site' } = {}
 ): Promise<CrawlResult[]> {
   const queue = new UrlQueue(options.maxDepth ?? 3, options.maxPages ?? 50);
   const results: CrawlResult[] = [];
 
   const { page, context } = await pool.acquirePage();
 
-  // 1. Lire robots.txt en premier pour connaître les restrictions
-  const robots = await readRobotsTxt(startUrl, page);
-
-  // 2. Essayer le sitemap (celui déclaré dans robots.txt, sinon l'emplacement standard)
-  const sitemapUrls = robots.sitemapUrls.length > 0
-    ? robots.sitemapUrls
-    : await readSitemap(startUrl, page);
-
-  console.log(`Crawler: robots rules disallowed=${robots.disallowedPaths.length} sitemapUrls=${sitemapUrls.length}`);
-
-  if (sitemapUrls.length > 0) {
-    sitemapUrls
-      .filter(url => isPathAllowed(url, robots.disallowedPaths))
-      .forEach((url) => queue.add(url, 0));
-  } else {
+  // If single-page mode, only scan the startUrl and do not read sitemap/robots nor extract links.
+  const scanMode = options.scanMode ?? 'single_page';
+  if (scanMode === 'single_page') {
+    console.log('Crawler: single_page mode — only the start URL will be scanned');
     queue.add(startUrl, 0);
+  } else {
+    // 1. Lire robots.txt en premier pour connaître les restrictions
+    const robots = await readRobotsTxt(startUrl, page);
+
+    // 2. Essayer le sitemap (celui déclaré dans robots.txt, sinon l'emplacement standard)
+    const sitemapUrls = robots.sitemapUrls.length > 0
+      ? robots.sitemapUrls
+      : await readSitemap(startUrl, page);
+
+    console.log(`Crawler: robots rules disallowed=${robots.disallowedPaths.length} sitemapUrls=${sitemapUrls.length}`);
+
+    if (sitemapUrls.length > 0) {
+      sitemapUrls
+        .filter(url => isPathAllowed(url, robots.disallowedPaths))
+        .forEach((url) => queue.add(url, 0));
+    } else {
+      queue.add(startUrl, 0);
+    }
   }
 
   // 3. Parcourir la file, en respectant robots.txt à chaque nouveau lien trouvé
@@ -86,10 +95,14 @@ export async function crawlSite(
       const title = await page.title();
       results.push({ url: current.url, title, depth: current.depth });
 
-      const links = await extractInternalLinks(page, startUrl);
-      links
-        .filter(link => isPathAllowed(link, robots.disallowedPaths))
-        .forEach((link) => queue.add(link, current.depth + 1));
+      if (scanMode !== 'single_page') {
+        const links = await extractInternalLinks(page, startUrl);
+        // re-check robots.txt filtering just in case
+        const robots = await readRobotsTxt(startUrl, page);
+        links
+          .filter(link => isPathAllowed(link, robots.disallowedPaths))
+          .forEach((link) => queue.add(link, current.depth + 1));
+      }
     } catch (error) {
       console.warn(`Impossible de scanner ${current.url}:`, error);
     }

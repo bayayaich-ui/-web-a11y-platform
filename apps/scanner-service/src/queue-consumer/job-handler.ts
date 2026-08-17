@@ -7,6 +7,7 @@ export interface ScanJob {
   url: string;
   max_pages: number;
   max_depth: number;
+  scan_mode?: 'single_page' | 'full_site';
 }
 
 type JobProcessor = (job: ScanJob) => Promise<void>;

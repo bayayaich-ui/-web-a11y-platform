@@ -1,9 +1,12 @@
 {
-  "/_not-found/page": "/_not-found",
   "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/demo/score-demo/page": "/demo/score-demo",
   "/page": "/",
   "/scans/[id]/page": "/scans/[id]",
+  "/scans/[id]/violations/[violationId]/page": "/scans/[id]/violations/[violationId]",
   "/scans/[id]/violations/page": "/scans/[id]/violations",
+  "/scans/page": "/scans",
   "/sites/new/page": "/sites/new",
   "/sites/page": "/sites"
 }

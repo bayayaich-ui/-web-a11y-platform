@@ -1,8 +1,6 @@
 {
-  "/page": "app/page.js",
-  "/sites/page": "app/sites/page.js",
-  "/sites/new/page": "app/sites/new/page.js",
-  "/scans/page": "app/scans/page.js",
   "/scans/[id]/page": "app/scans/[id]/page.js",
-  "/scans/[id]/violations/page": "app/scans/[id]/violations/page.js"
+  "/scans/[id]/violations/[violationId]/page": "app/scans/[id]/violations/[violationId]/page.js",
+  "/scans/[id]/violations/page": "app/scans/[id]/violations/page.js",
+  "/sites/page": "app/sites/page.js"
 }

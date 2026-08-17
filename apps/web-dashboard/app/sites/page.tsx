@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { fetchSites } from '../../lib/api';
+import StartScanButtons from '../../components/StartScanButtons';
 
 function scoreColor(score: number | null) {
   if (score === null) return 'text-mineur';
@@ -54,13 +55,16 @@ export default async function SitesPage() {
                   {site.last_scan_date ? new Date(site.last_scan_date).toLocaleDateString('fr-FR') : '—'}
                 </td>
                 <td className="px-4 py-4 text-right">
-                  {site.last_scan_id ? (
-                    <Link href={`/scans/${site.last_scan_id}`} className="text-[var(--color-primary)] font-medium hover:underline">
-                      Voir le détail →
-                    </Link>
-                  ) : (
-                    <span className="text-mineur text-sm">Aucun scan disponible</span>
-                  )}
+                  <div className="flex items-center justify-end gap-3">
+                    <StartScanButtons siteId={site.id} />
+                    {site.last_scan_id ? (
+                      <Link href={`/scans/${site.last_scan_id}`} className="text-[var(--color-primary)] font-medium hover:underline">
+                        Voir le détail →
+                      </Link>
+                    ) : (
+                      <span className="text-mineur text-sm">Aucun scan disponible</span>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

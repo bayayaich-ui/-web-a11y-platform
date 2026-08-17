@@ -3,10 +3,40 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"No tests yet\""
+    "dev": "next dev -p 3000",
+    "kill-port": "npx kill-port 3000",
+    "dev:alt": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "test": "vitest",
+    "test:e2e": "playwright test --config=playwright.config.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "next": "16.2.12",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^15.0.0",
+    "jsdom": "^22.1.0",
+    "@types/react": "19.2.18",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
+    "vitest": "^0.34.5",
+    "@playwright/test": "^1.43.0"
+  },
+  "vitest": {
+    "test": {
+      "environment": "jsdom",
+      "globals": true
+    }
+  }
 }
+

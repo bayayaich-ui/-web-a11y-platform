@@ -1,12 +1,19 @@
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 
 
 class SiteCreate(BaseModel):
     url: str
     name: str
+    scan_mode: Optional[Literal["single_page", "full_site"]] = "single_page"
+
+
+class ScanCreate(BaseModel):
+    scan_mode: Optional[Literal["single_page", "full_site"]] = "single_page"
+    max_pages: Optional[int] = 50
+    max_depth: Optional[int] = 3
 
 
 class SiteResponse(BaseModel):

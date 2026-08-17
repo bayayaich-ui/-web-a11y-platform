@@ -1,7 +1,8 @@
-﻿'use client';
+﻿ 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { fetchViolations, Violation } from '../../../../lib/api';
 import { PRIORITY_DISPLAY } from '../../../../lib/types';
 
@@ -9,7 +10,8 @@ const REFRESH_INTERVAL_MS = 3000;
 
 export default function ViolationsPage() {
   const params = useParams();
-  const id = params?.id;
+  const rawId = params?.id;
+  const id = Array.isArray(rawId) ? rawId[0] : rawId;
   const [violations, setViolations] = useState<Violation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +70,7 @@ export default function ViolationsPage() {
                     {display.label}
                   </span>
                   <div className="flex-1">
-                    <div className="font-medium">{v.message}</div>
+                    <div className="font-medium"><Link href={`/scans/${id}/violations/${v.id}`}>{v.message}</Link></div>
                     <div className="text-sm text-mineur font-mono">
                       {v.rule} · {v.page_url}
                     </div>

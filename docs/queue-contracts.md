@@ -24,6 +24,8 @@ Deux files, un sens de circulation par file. Ni le Backend ni le Scanner ne s'ap
 | `max_pages` | integer       | oui         | Nombre maximum de pages à crawler                 |
 | `max_depth` | integer       | oui         | Profondeur maximale de crawl                      |
 
+| `scan_mode` | string        | oui         | `"single_page"` \| `"full_site"` — indique si le scanner doit suivre les liens ou seulement traiter l'URL de départ |
+
 ### Exemple
 
 ```json
@@ -32,7 +34,8 @@ Deux files, un sens de circulation par file. Ni le Backend ni le Scanner ne s'ap
   "site_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
   "url": "https://client-site.com",
   "max_pages": 50,
-  "max_depth": 3
+  "max_depth": 3,
+  "scan_mode": "single_page"
 }
 ```
 

@@ -10,6 +10,7 @@ export default function NewSitePage() {
   const router = useRouter();
   const [url, setUrl] = useState('');
   const [name, setName] = useState('');
+  const [scanMode, setScanMode] = useState<'single_page' | 'full_site'>('single_page');
   const [erreur, setErreur] = useState<string | null>(null);
   const [enCours, setEnCours] = useState(false);
 
@@ -34,7 +35,7 @@ export default function NewSitePage() {
     setEnCours(true);
 
     try {
-      await createSite(url, name);
+      await createSite(url, name, scanMode);
       router.push('/sites');
       router.refresh();
     } catch (err) {
@@ -79,13 +80,44 @@ export default function NewSitePage() {
           </p>
         )}
 
-        <div className="flex gap-3 justify-end">
-          <Button variant="secondary" type="button" onClick={() => router.push('/sites')}>
-            Annuler
-          </Button>
-          <Button variant="primary" type="submit" disabled={enCours}>
-            {enCours ? 'Ajout en cours…' : 'Ajouter et lancer le scan'}
-          </Button>
+        <div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Mode de scan</label>
+            <div className="flex items-center gap-4 mb-4">
+              <label className="text-sm flex items-center">
+                <input
+                  type="radio"
+                  name="scan_mode"
+                  value="single_page"
+                  checked={scanMode === 'single_page'}
+                  onChange={() => setScanMode('single_page')}
+                  className="mr-2"
+                />
+                <span>Scan d'une seule page (rapide)</span>
+              </label>
+
+              <label className="text-sm flex items-center">
+                <input
+                  type="radio"
+                  name="scan_mode"
+                  value="full_site"
+                  checked={scanMode === 'full_site'}
+                  onChange={() => setScanMode('full_site')}
+                  className="mr-2"
+                />
+                <span>Scan complet du site (lent)</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="flex gap-3 justify-end">
+            <Button variant="secondary" type="button" onClick={() => router.push('/sites')}>
+              Annuler
+            </Button>
+            <Button variant="primary" type="submit" disabled={enCours}>
+              {enCours ? 'Ajout en cours…' : 'Ajouter et lancer le scan'}
+            </Button>
+          </div>
         </div>
       </form>
     </div>

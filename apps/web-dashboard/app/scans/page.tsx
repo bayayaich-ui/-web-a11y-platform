@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { fetchSites, SiteApi } from '../../lib/api';
 
