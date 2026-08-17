@@ -27,9 +27,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Configure CORS origins from environment (comma-separated). Default allows localhost:3000 and 3001 for development.
-# This covers cases where the Next dev server runs on 3001 to avoid 'Failed to fetch' from the browser.
-allowed = os.getenv("CORS_ALLOW_ORIGINS", "http://localhost:3000,http://localhost:3001")
+# Configure CORS origins from environment (comma-separated). Default allows localhost:3000, 3001, 3002 for development.
+# This covers cases where the Next dev server runs on different ports to avoid 'Failed to fetch' from the browser.
+allowed = os.getenv("CORS_ALLOW_ORIGINS", "http://localhost:3000,http://localhost:3001,http://localhost:3002")
 allow_origins = [o.strip() for o in allowed.split(",") if o.strip()]
 
 app.add_middleware(
