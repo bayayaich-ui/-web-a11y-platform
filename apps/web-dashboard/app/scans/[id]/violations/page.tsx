@@ -53,32 +53,32 @@ export default function ViolationsPage() {
     return order[a.priority as any] - order[b.priority as any];
   });
 
-  return (
-    <div>
-      <h1 className="font-display text-2xl font-bold mb-6">Violations détectées</h1>
+    return (
+    <div className="space-y-6">
+      <div><p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--color-primary)]">Diagnostic</p><h1 className="mt-2 font-display text-3xl font-bold text-[#102d4f]">Violations détectées</h1><p className="mt-2 text-[var(--color-muted)]">Chaque résultat indique où agir et pourquoi.</p></div>
 
       {triees.length === 0 ? (
         <p className="text-success font-medium">✅ Aucune violation détectée !</p>
       ) : (
         <ul className="flex flex-col gap-3">
           {triees.map((v) => {
-            const display = PRIORITY_DISPLAY[v.priority as any];
+            const display = PRIORITY_DISPLAY[v.priority as any] ?? { label: v.priority, className: 'bg-[#edf3f9] text-[#294967] border-[var(--color-border)]' };
             return (
-              <li key={v.id} className="bg-white rounded-lg border border-border p-4 flex flex-col gap-2">
+              <li key={v.id} className="flex flex-col gap-3 rounded-2xl border border-[var(--color-border)] bg-white p-5 shadow-sm">
                 <div className="flex items-start gap-4">
-                  <span className={`shrink-0 px-2 py-1 rounded text-xs font-semibold border ${display.className}`}>
+                  <span className={`shrink-0 rounded-full border px-3 py-1 text-xs font-bold ${display.className}`}>
                     {display.label}
                   </span>
                   <div className="flex-1">
-                    <div className="font-medium"><Link href={`/scans/${id}/violations/${v.id}`}>{v.message}</Link></div>
-                    <div className="text-sm text-mineur font-mono">
-                      {v.rule} · {v.page_url}
+                    <div className="font-semibold text-[#102d4f]">{v.message}</div>
+                    <div className="mt-2 text-xs text-[var(--color-muted)]">
+                      <span className="font-mono font-semibold">{v.rule}</span><span aria-hidden="true"> · </span>{v.page_url}
                     </div>
                   </div>
                 </div>
                 {v.element && (
                   <div className="text-xs font-mono text-mineur bg-surface p-3 rounded overflow-auto">
-                    <div className="text-mineur mb-1">Element HTML:</div>
+                    <div className="mb-1 font-semibold text-[var(--color-muted)]">Élément HTML affecté</div>
                     <code>{v.element}</code>
                   </div>
                 )}

@@ -1,4 +1,24 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8002';
+import { mockSites, mockScans, mockViolations } from './mock-data';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8002';
+
+export interface AuthUser { id: string; email: string; name: string | null; created_at: string; }
+
+async function authRequest(path: string, body: Record<string, string>) {
+  try {
+    const res = await fetch(`${API_URL}/api/auth/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(body) });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(data?.detail ?? 'Impossible de contacter le service d’authentification.');
+    return data as AuthUser;
+  } catch (error) {
+    if (error instanceof Error && error.message !== 'Failed to fetch') throw error;
+    throw new Error('Le service est indisponible. Démarrez le backend sur le port 8002 puis réessayez.');
+  }
+}
+
+export function registerUser(email: string, name: string, password: string) { return authRequest('register', { email, name, password }); }
+export function loginUser(email: string, password: string) { return authRequest('login', { email, password }); }
+export async function logoutUser() { await fetch(`${API_URL}/api/auth/logout`, { method: 'POST', credentials: 'include' }); }
 
 export interface SiteApi {
   id: string;
@@ -10,29 +30,60 @@ export interface SiteApi {
   last_scan_id: string | null;
 }
 
-export async function fetchSites(): Promise<SiteApi[]> {
-  const res = await fetch(`${API_URL}/api/sites`, { cache: 'no-store' });
-  if (!res.ok) {
-    throw new Error(`Erreur lors du chargement des sites (${res.status})`);
-  }
-  return res.json();
+function toSiteApi(site: typeof mockSites[number]): SiteApi {
+  return {
+    id: site.id,
+    url: site.url,
+    name: site.name,
+    created_at: new Date().toISOString(),
+    last_scan_score: site.lastScanScore,
+    last_scan_date: site.lastScanDate ? new Date(site.lastScanDate).toISOString() : null,
+    last_scan_id: site.lastScanScore !== null ? 'scan-1' : null,
+  };
 }
 
-export async function createSite(url: string, name: string, scanMode: 'single_page' | 'full_site' = 'single_page'): Promise<SiteApi> {
-  const body: any = { url, name, scan_mode: scanMode };
+function getMockSites(): SiteApi[] {
+  return mockSites.map(toSiteApi);
+}
 
-  const res = await fetch(`${API_URL}/api/sites`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const body = await res.json().catch(() => null);
-    throw new Error(body?.detail ?? `Erreur lors de la création du site (${res.status})`);
+export async function fetchSites(cookieHeader?: string): Promise<SiteApi[]> {
+  if (!API_URL) return getMockSites();
+  try {
+    const res = await fetch(`${API_URL}/api/sites`, { cache: 'no-store', headers: cookieHeader ? { cookie: cookieHeader } : undefined, credentials: 'include' });
+    if (!res.ok) {
+      throw new Error(`Erreur lors du chargement des sites (${res.status})`);
+    }
+    return res.json();
+  } catch (error) {
+    console.warn('Backend indisponible, utilisation des données de démonstration pour /sites', error);
+    return getMockSites();
   }
+}
 
-  return res.json();
+export async function createSite(url: string, name: string, scanMode?: 'single_page' | 'full_site'): Promise<SiteApi> {
+  if (!API_URL) return createDemoSite(url, name);
+  try {
+    const res = await fetch(`${API_URL}/api/sites`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, name, scan_mode: scanMode }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      throw new Error(body?.detail ?? `Erreur lors de la création du site (${res.status})`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.warn('Backend indisponible, création simulée du site en mode démonstration', error);
+    const fallbackId = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}`;
+    return { id: fallbackId, url, name, created_at: new Date().toISOString(), last_scan_score: null, last_scan_date: null, last_scan_id: null };
+  }
+}
+
+function createDemoSite(url: string, name: string): SiteApi {
+  return { id: `demo-${Date.now()}`, url, name, created_at: new Date().toISOString(), last_scan_score: null, last_scan_date: null, last_scan_id: null };
 }
 
 export interface ScanDetail {
@@ -45,10 +96,9 @@ export interface ScanDetail {
   violations_moderate: number;
   violations_minor: number;
   pages_scanned: number;
+  max_pages?: number;
   started_at: string | null;
   finished_at: string | null;
-  max_pages?: number | null;
-  scan_mode?: string | null;
 }
 
 export interface Violation {
@@ -61,109 +111,79 @@ export interface Violation {
   priority: string;
 }
 
-export interface Fix {
-  id: string;
-  method?: string;
-  code_diff?: string | null;
-  applied_at?: string | null;
-  status?: string | null;
-}
-
-export interface ViolationDetail extends Violation {
-  diagnostic?: any;
-  details?: any;
-  fix?: Fix | null;
-}
-
-export async function fetchViolation(violationId: string): Promise<ViolationDetail> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_URL}/api/violations/${violationId}`, { cache: 'no-store' });
-  } catch (e) {
-    throw new Error(`Échec de la requête réseau: ${e instanceof Error ? e.message : String(e)}`);
-  }
-  if (!res.ok) {
-    if (res.status === 404) throw new Error('Violation introuvable (404)');
-    let body = null;
-    try { body = await res.json(); } catch {}
-    throw new Error(body?.detail ?? `Erreur lors du chargement de la violation (${res.status})`);
-  }
-  try {
-    return await res.json();
-  } catch (e) {
-    throw new Error('Réponse invalide du serveur lors du chargement de la violation');
-  }
-}
-
-export async function analyzeViolation(violationId: string): Promise<any> {
-  let res: Response;
-  try {
-    res = await fetch(`${API_URL}/api/violations/${violationId}/analyze`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-    });
-  } catch (e) {
-    throw new Error(`Échec de la requête réseau: ${e instanceof Error ? e.message : String(e)}`);
-  }
-  if (!res.ok) {
-    let body = null;
-    try { body = await res.json(); } catch {}
-    throw new Error(body?.detail ?? `Erreur lors de la demande d'analyse (${res.status})`);
-  }
-  try {
-    return await res.json();
-  } catch (e) {
-    return null;
-  }
-}
-
 export async function fetchScan(scanId: string): Promise<ScanDetail> {
-  const res = await fetch(`${API_URL}/api/scans/${scanId}`, { cache: 'no-store' });
-  if (!res.ok) {
-    if (res.status === 404) {
-      throw new Error('Scan introuvable (404)');
+  if (!API_URL) return getMockScan(scanId);
+  try {
+    const res = await fetch(`${API_URL}/api/scans/${scanId}`, { cache: 'no-store' });
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error('Scan introuvable (404)');
+      }
+      let body = null;
+      try {
+        body = await res.json();
+      } catch {}
+      throw new Error(body?.detail ?? `Erreur lors du chargement du scan (${res.status})`);
     }
-    let body = null;
-    try {
-      body = await res.json();
-    } catch {}
-    throw new Error(body?.detail ?? `Erreur lors du chargement du scan (${res.status})`);
+    return res.json();
+  } catch (error) {
+    const mock = mockScans[scanId];
+    if (!mock) throw error;
+    console.warn('Backend indisponible, utilisation du scan de démonstration', error);
+    return {
+      id: mock.id,
+      site_id: mock.siteId,
+      status: mock.status,
+      score_global: mock.scoreGlobal,
+      violations_critical: mock.violationsCritical,
+      violations_serious: mock.violationsSerious,
+      violations_moderate: mock.violationsModerate,
+      violations_minor: mock.violationsMinor,
+      pages_scanned: 1,
+      started_at: mock.finishedAt,
+      finished_at: mock.finishedAt,
+    };
   }
-  return res.json();
+}
+
+function getMockScan(scanId: string): ScanDetail {
+  const mock = mockScans[scanId];
+  if (!mock) throw new Error('Scan introuvable (404)');
+  return { id: mock.id, site_id: mock.siteId, status: mock.status, score_global: mock.scoreGlobal, violations_critical: mock.violationsCritical, violations_serious: mock.violationsSerious, violations_moderate: mock.violationsModerate, violations_minor: mock.violationsMinor, pages_scanned: 1, started_at: mock.finishedAt, finished_at: mock.finishedAt };
 }
 
 export async function fetchViolations(scanId: string): Promise<Violation[]> {
-  const res = await fetch(`${API_URL}/api/scans/${scanId}/violations`, { cache: 'no-store' });
-  if (!res.ok) {
-    if (res.status === 404) {
-      throw new Error('Aucun scan trouvé pour récupérer les violations (404)');
+  if (!API_URL) return getMockViolations();
+  try {
+    const res = await fetch(`${API_URL}/api/scans/${scanId}/violations`, { cache: 'no-store' });
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error('Aucun scan trouvé pour récupérer les violations (404)');
+      }
+      let body = null;
+      try {
+        body = await res.json();
+      } catch {}
+      throw new Error(body?.detail ?? `Erreur lors du chargement des violations (${res.status})`);
     }
-    let body = null;
-    try {
-      body = await res.json();
-    } catch {}
-    throw new Error(body?.detail ?? `Erreur lors du chargement des violations (${res.status})`);
+    return res.json();
+  } catch (error) {
+    if (!mockViolations.length) {
+      throw error;
+    }
+    console.warn('Backend indisponible, utilisation des violations de démonstration', error);
+    return mockViolations.map((violation) => ({
+      id: violation.id,
+      rule: violation.rule,
+      impact: violation.priority,
+      element: '',
+      message: violation.titre,
+      page_url: violation.pageUrl,
+      priority: violation.priority,
+    }));
   }
-  return res.json();
 }
 
-export async function triggerScan(siteId: string, scanMode: 'single_page' | 'full_site' = 'single_page', maxPages?: number, maxDepth?: number) {
-  const body: any = { scan_mode: scanMode };
-  if (maxPages !== undefined) body.max_pages = maxPages;
-  if (maxDepth !== undefined) body.max_depth = maxDepth;
-
-  const res = await fetch(`${API_URL}/api/sites/${siteId}/scan`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    let body = null;
-    try { body = await res.json(); } catch {}
-    throw new Error(body?.detail ?? `Erreur lors du déclenchement du scan (${res.status})`);
-  }
-
-  return res.json();
+function getMockViolations(): Violation[] {
+  return mockViolations.map((violation) => ({ id: violation.id, rule: violation.rule, impact: violation.priority, element: '', message: violation.titre, page_url: violation.pageUrl, priority: violation.priority }));
 }

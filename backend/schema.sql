@@ -12,6 +12,7 @@ CREATE TABLE users (
     id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     email       text NOT NULL UNIQUE,
     name        text,
+    password_hash text,
     created_at  timestamp NOT NULL DEFAULT now()
 );
 

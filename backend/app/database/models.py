@@ -71,6 +71,7 @@ class User(Base):
 
     email = Column(Text, unique=True, nullable=False)
     name = Column(Text)
+    password_hash = Column(Text, nullable=True)
 
     created_at = Column(
         DateTime,

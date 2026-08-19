@@ -4,7 +4,8 @@ from uuid import uuid4
 from datetime import datetime
 
 from app.database.database import get_db
-from app.database.models import Site, Scan, User
+from app.database.models import Site, Scan
+from app.api.auth.routes import get_current_user
 from app.schemas.site import SiteCreate, SiteResponse
 from app.services.queue_publisher import publish_scan_job
 from app.schemas.site import ScanCreate
@@ -13,23 +14,9 @@ from uuid import UUID as UUIDType
 
 router = APIRouter(prefix="/api/sites", tags=["sites"])
 
-# Pas d'authentification pour l'instant : un utilisateur de démo unique
-# sert de propriétaire par défaut, en attendant le ticket d'authentification
-DEFAULT_USER_EMAIL = "demo@a11y-platform.local"
-
-
-def get_or_create_default_user(db: Session) -> User:
-    user = db.query(User).filter(User.email == DEFAULT_USER_EMAIL).first()
-    if user is None:
-        user = User(id=uuid4(), email=DEFAULT_USER_EMAIL, name="Utilisateur démo")
-        db.add(user)
-        db.flush()
-    return user
-
-
 @router.get("", response_model=list[SiteResponse])
-def list_sites(db: Session = Depends(get_db)):
-    sites = db.query(Site).order_by(Site.created_at.desc()).all()
+def list_sites(db: Session = Depends(get_db), user=Depends(get_current_user)):
+    sites = db.query(Site).filter(Site.user_id == user.id).order_by(Site.created_at.desc()).all()
 
     result = []
     for site in sites:
@@ -54,9 +41,7 @@ def list_sites(db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=SiteResponse, status_code=201)
-async def create_site(payload: SiteCreate, db: Session = Depends(get_db)):
-    user = get_or_create_default_user(db)
-
+async def create_site(payload: SiteCreate, db: Session = Depends(get_db), user=Depends(get_current_user)):
     site = Site(id=uuid4(), user_id=user.id, url=payload.url, name=payload.name)
     db.add(site)
     db.flush()
@@ -93,7 +78,7 @@ async def create_site(payload: SiteCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/{site_id}/scan", status_code=201)
-async def trigger_scan(site_id: str, payload: ScanCreate, db: Session = Depends(get_db)):
+async def trigger_scan(site_id: str, payload: ScanCreate, db: Session = Depends(get_db), user=Depends(get_current_user)):
     # Validate site exists
     try:
         site_uuid = UUIDType(site_id)
@@ -101,7 +86,7 @@ async def trigger_scan(site_id: str, payload: ScanCreate, db: Session = Depends(
         raise HTTPException(status_code=400, detail="Identifiant de site invalide")
 
     site = db.query(Site).filter(Site.id == site_uuid).first()
-    if site is None:
+    if site is None or site.user_id != user.id:
         raise HTTPException(status_code=404, detail="Site introuvable")
 
     # Create scan row

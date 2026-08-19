@@ -1,0 +1,3 @@
+import { ModuleIntro } from '../../components/ModuleIntro';
+
+export default function ViolationsPage() { return <div className="space-y-8"><ModuleIntro eyebrow="Conformité" title="Violations" description="Retrouvez les problèmes détectés sur l’ensemble de vos sites et priorisez les corrections." /><div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-10 text-center"><p className="font-display text-xl font-semibold text-[#102d4f]">Les violations globales apparaîtront ici</p><p className="mt-2 text-sm text-[var(--color-muted)]">Ouvrez un scan pour consulter les détails disponibles dès maintenant.</p></div></div>; }

@@ -1,0 +1,3 @@
+export function ModuleIntro({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
+  return <div className="space-y-2"><p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--color-primary)]">{eyebrow}</p><h1 className="font-display text-3xl font-bold text-[#102d4f]">{title}</h1><p className="max-w-2xl text-[var(--color-muted)]">{description}</p></div>;
+}

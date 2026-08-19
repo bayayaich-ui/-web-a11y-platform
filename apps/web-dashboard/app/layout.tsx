@@ -1,5 +1,5 @@
 import './globals.css';
-import { Sidebar } from '../components/Sidebar';
+import { AppShell } from '../components/AppShell';
 
 export const metadata = {
   title: 'Web Accessibility Platform — Dashboard',
@@ -18,12 +18,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           Aller au contenu principal
         </a>
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main id="main-content" className="flex-1 p-8">
-            {children}
-          </main>
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

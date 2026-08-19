@@ -1,76 +1,18 @@
 import Link from 'next/link';
 import { fetchSites } from '../../lib/api';
-import StartScanButtons from '../../components/StartScanButtons';
+import { cookies } from 'next/headers';
 
-function scoreColor(score: number | null) {
-  if (score === null) return 'text-mineur';
-  if (score >= 80) return 'text-success';
-  if (score >= 50) return 'text-majeur';
-  return 'text-bloquant';
-}
+function scoreLabel(score: number | null) { return score === null ? 'Non analysé' : score >= 80 ? 'Bon' : score >= 50 ? 'À améliorer' : 'Prioritaire'; }
 
 export default async function SitesPage() {
-  const sites = await fetchSites();
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-2xl font-bold">Vos sites</h1>
-        <Link href="/sites/new">
-          <button className="px-4 py-2 rounded bg-[var(--color-primary)] text-[var(--color-primary-contrast)] font-medium hover:opacity-95 focus-ring min-touch">
-            + Ajouter un site
-          </button>
-        </Link>
-      </div>
-
-      {sites.length === 0 ? (
-        <p className="text-mineur">Aucun site enregistré pour l'instant.</p>
-      ) : (
-        <table className="w-full bg-white rounded-lg border border-border overflow-hidden">
-          <thead className="bg-surface text-left text-sm text-mineur">
-            <tr>
-              <th scope="col" className="px-4 py-3">Site</th>
-              <th scope="col" className="px-4 py-3">Dernier score</th>
-              <th scope="col" className="px-4 py-3">Dernier scan</th>
-              <th scope="col" className="px-4 py-3"><span className="sr-only">Actions</span></th>
-            </tr>
-          </thead>
-          <tbody>
-            {sites.map((site) => (
-              <tr key={site.id} className="border-t border-border">
-                <td className="px-4 py-4">
-                  <div className="font-medium">{site.name}</div>
-                  <div className="text-sm text-mineur font-mono">{site.url}</div>
-                </td>
-                <td className="px-4 py-4">
-                  {site.last_scan_score !== null ? (
-                    <span className={`font-mono font-semibold ${scoreColor(site.last_scan_score)}`}>
-                      {site.last_scan_score.toFixed(1)}%
-                    </span>
-                  ) : (
-                    <span className="text-mineur text-sm">Pas encore scanné</span>
-                  )}
-                </td>
-                <td className="px-4 py-4 text-sm text-mineur">
-                  {site.last_scan_date ? new Date(site.last_scan_date).toLocaleDateString('fr-FR') : '—'}
-                </td>
-                <td className="px-4 py-4 text-right">
-                  <div className="flex items-center justify-end gap-3">
-                    <StartScanButtons siteId={site.id} />
-                    {site.last_scan_id ? (
-                      <Link href={`/scans/${site.last_scan_id}`} className="text-[var(--color-primary)] font-medium hover:underline">
-                        Voir le détail →
-                      </Link>
-                    ) : (
-                      <span className="text-mineur text-sm">Aucun scan disponible</span>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
-  );
+  const sites = await fetchSites((await cookies()).toString());
+  const analysed = sites.filter((site) => site.last_scan_score !== null);
+  const average = analysed.length ? analysed.reduce((total, site) => total + (site.last_scan_score ?? 0), 0) / analysed.length : 0;
+  return <div className="space-y-8">
+    <section className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--color-primary)]">Vue d’ensemble</p><h1 className="mt-2 font-display text-3xl font-bold text-[#102d4f]">Votre accessibilité, en clair.</h1><p className="mt-2 max-w-xl text-[var(--color-muted)]">Surveillez les parcours essentiels et donnez à votre équipe un cap concret pour chaque correction.</p></div><Link href="/sites/new" className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#1457a6] px-4 font-semibold text-white shadow-sm hover:bg-[#102d4f] focus-ring">+ Ajouter un site</Link></section>
+    <section aria-label="Indicateurs clés" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Stat label="Score moyen" value={analysed.length ? `${average.toFixed(0)}/100` : '—'} detail={analysed.length ? 'sur les sites analysés' : 'Lancez votre premier scan'} accent="green" /><Stat label="Sites suivis" value={String(sites.length)} detail="dans votre workspace" accent="blue" /><Stat label="Scans disponibles" value={String(analysed.length)} detail="dernier scan par site" accent="amber" /><Stat label="À surveiller" value={String(sites.filter((site) => site.last_scan_score !== null && site.last_scan_score < 80).length)} detail="score inférieur à 80" accent="red" /></section>
+    <section aria-labelledby="sites-title"><div className="mb-4"><h2 id="sites-title" className="font-display text-xl font-bold text-[#102d4f]">Sites surveillés</h2><p className="text-sm text-[var(--color-muted)]">Les dernières données connues par domaine.</p></div>{sites.length === 0 ? <div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-10 text-center text-[var(--color-muted)]">Aucun site enregistré pour l'instant.</div> : <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white"><div className="hidden grid-cols-[1.5fr_0.7fr_0.8fr_0.7fr] gap-4 border-b border-[var(--color-border)] bg-[#f7faff] px-5 py-3 text-xs font-bold uppercase tracking-wide text-[var(--color-muted)] md:grid"><span>Site</span><span>Score</span><span>Dernier scan</span><span>État</span></div><div className="divide-y divide-[var(--color-border)]">{sites.map((site) => <div key={site.id} className="grid gap-3 px-5 py-4 md:grid-cols-[1.5fr_0.7fr_0.8fr_0.7fr] md:items-center md:gap-4"><div><p className="font-semibold text-[#102d4f]">{site.name}</p><p className="break-all font-mono text-xs text-[var(--color-muted)]">{site.url}</p></div><div><span className="mr-2 text-xs text-[var(--color-muted)] md:hidden">Score</span><strong className="font-mono text-lg text-[#102d4f]">{site.last_scan_score === null ? '—' : `${site.last_scan_score.toFixed(0)}/100`}</strong></div><div className="text-sm text-[var(--color-muted)]"><span className="mr-2 text-xs md:hidden">Dernier scan</span>{site.last_scan_date ? new Date(site.last_scan_date).toLocaleDateString('fr-FR') : 'Jamais'}</div><div className="flex items-center justify-between gap-3"><span className="rounded-full bg-[#edf3f9] px-2.5 py-1 text-xs font-semibold text-[#294967]">{scoreLabel(site.last_scan_score)}</span>{site.last_scan_id && <Link href={`/scans/${site.last_scan_id}`} className="text-sm font-semibold hover:underline focus-ring">Détails</Link>}</div></div>)}</div></div>}</section>
+  </div>;
 }
+
+function Stat({ label, value, detail, accent }: { label: string; value: string; detail: string; accent: string }) { return <article className="rounded-2xl border border-[var(--color-border)] bg-white p-5"><span className={`mb-5 block h-2 w-10 rounded-full ${accent === 'green' ? 'bg-[#49b883]' : accent === 'blue' ? 'bg-[#4f91d1]' : accent === 'amber' ? 'bg-[#e3a72f]' : 'bg-[#cf5648]'}`} aria-hidden="true" /><p className="text-sm font-semibold text-[var(--color-muted)]">{label}</p><p className="mt-2 font-display text-3xl font-bold text-[#102d4f]">{value}</p><p className="mt-1 text-xs text-[var(--color-muted)]">{detail}</p></article>; }

@@ -1,0 +1,11 @@
+'use client';
+
+import Link from 'next/link';
+import { useState } from 'react';
+import type { SiteApi } from '../lib/api';
+
+export function ScanList({ sites }: { sites: SiteApi[] }) {
+  const [query, setQuery] = useState('');
+  const filtered = sites.filter((site) => `${site.name} ${site.url}`.toLowerCase().includes(query.toLowerCase()));
+  return <div className="overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white"><div className="border-b border-[var(--color-border)] bg-[#f7faff] px-5 py-4"><label htmlFor="scan-search" className="sr-only">Rechercher un site</label><input id="scan-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Rechercher un site ou une URL" className="min-h-11 w-full max-w-md rounded-lg border border-[var(--color-border)] bg-white px-3 focus-ring" /></div>{filtered.length === 0 ? <p className="p-8 text-[var(--color-muted)]">Aucun site ne correspond à votre recherche.</p> : <div className="divide-y divide-[var(--color-border)]">{filtered.map((site) => <article key={site.id} className="flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="font-semibold text-[#102d4f]">{site.name}</h2><p className="mt-1 break-all font-mono text-xs text-[var(--color-muted)]">{site.url}</p></div><div className="flex flex-wrap items-center gap-5 text-sm"><span><span className="block text-xs text-[var(--color-muted)]">Score</span><strong className="font-mono text-lg">{site.last_scan_score === null ? '—' : `${site.last_scan_score.toFixed(0)}/100`}</strong></span><span><span className="block text-xs text-[var(--color-muted)]">Date</span>{site.last_scan_date ? new Date(site.last_scan_date).toLocaleDateString('fr-FR') : 'Jamais'}</span>{site.last_scan_id ? <Link href={`/scans/${site.last_scan_id}`} className="min-h-11 rounded-lg border border-[var(--color-primary)] px-3 py-2 font-semibold text-[var(--color-primary)] hover:bg-[#edf3f9] focus-ring">Ouvrir le scan</Link> : <span className="text-[var(--color-muted)]">En attente</span>}</div></article>)}</div>}</div>;
+}

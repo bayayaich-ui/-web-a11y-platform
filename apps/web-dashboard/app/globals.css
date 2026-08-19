@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -8,29 +8,29 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #F5F6F8;
-  color: #101418;
-  font-family: 'Inter', sans-serif;
+  background-color: #f4f7fb;
+  color: #132238;
+  font-family: 'DM Sans', sans-serif;
 }
 
 /* Focus clavier visible partout — non négociable pour un outil d'accessibilité */
 :focus-visible {
-  outline: 2px solid #1F4B99;
-  outline-offset: 2px;
+  outline: 3px solid #f59e0b;
+  outline-offset: 3px;
 }
 
 /* Design system variables */
 :root {
-  --color-bg: #F5F6F8;
-  --color-surface: #FFFFFF;
-  --color-ink: #0F1720;
-  --color-primary: #0b74ff; /* vivid blue (modernized) */
+  --color-bg: #f4f7fb;
+  --color-surface: #ffffff;
+  --color-ink: #132238;
+  --color-primary: #1457a6;
   --color-primary-contrast: #FFFFFF;
-  --color-muted: #6B7280;
-  --color-success: #0b9d58;
-  --color-danger: #e63946;
-  --color-border: #E6EEF8;
-  --color-surface-2: #F1F5F9;
+  --color-muted: #4b5d73;
+  --color-success: #087443;
+  --color-danger: #b42318;
+  --color-border: #d9e2ee;
+  --color-surface-2: #edf3f9;
   --radius-sm: 8px;
   --shadow-sm: 0 1px 2px rgba(16,24,40,0.04), 0 4px 12px rgba(16,24,40,0.06);
 }
@@ -57,3 +57,24 @@ body {
     animation: none !important;
   }
 }
+
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+.surface-grid { background-image: linear-gradient(#d9e2ee 1px, transparent 1px), linear-gradient(90deg, #d9e2ee 1px, transparent 1px); background-size: 28px 28px; }
+.login-aurora {
+  background-image: radial-gradient(circle at 78% 16%, rgba(42, 196, 207, 0.24), transparent 25%), radial-gradient(circle at 12% 88%, rgba(20, 87, 166, 0.65), transparent 32%), linear-gradient(135deg, #102d4f 0%, #0b4169 52%, #08304f 100%);
+}
+.login-aurora::before,
+.login-aurora::after {
+  position: absolute;
+  border: 1px solid rgba(139, 213, 180, 0.28);
+  border-radius: 999px;
+  content: '';
+  pointer-events: none;
+}
+.login-aurora::before { width: 34rem; height: 34rem; right: -14rem; top: 10rem; box-shadow: 0 0 0 5rem rgba(139, 213, 180, 0.04), 0 0 0 10rem rgba(139, 213, 180, 0.03); }
+.login-aurora::after { width: 16rem; height: 16rem; left: -8rem; bottom: 8rem; }
+.login-logo-stage { background: rgba(223, 244, 251, 0.92); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2); }
+img[src="/login-logo.png"] { background-color: #dff4fb !important; box-shadow: 0 16px 35px rgba(16, 45, 79, 0.16); }
+a { color: var(--color-primary); }
+button, input { font: inherit; }

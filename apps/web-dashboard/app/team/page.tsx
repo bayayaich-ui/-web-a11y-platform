@@ -1,0 +1,3 @@
+import { ModuleIntro } from '../../components/ModuleIntro';
+
+export default function TeamPage() { return <div className="space-y-8"><ModuleIntro eyebrow="Collaboration" title="Équipe" description="Invitez les personnes qui participent à vos audits et clarifiez les responsabilités." /><div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-10 text-center"><p className="font-display text-xl font-semibold text-[#102d4f]">Gestion des membres à venir</p><p className="mt-2 text-sm text-[var(--color-muted)]">Votre compte administrateur est actif. Les invitations et rôles seront ajoutés dans ce module.</p></div></div>; }

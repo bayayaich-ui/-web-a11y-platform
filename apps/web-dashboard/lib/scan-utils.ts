@@ -1,0 +1,3 @@
+export function deriveStepLabel(status: string) { return status === 'completed' ? 'Analyse terminée' : status === 'failed' ? 'Analyse interrompue' : 'Analyse en cours'; }
+export function formatElapsed(startedAt: string | null) { if (!startedAt) return '—'; return `${Math.max(0, Math.round((Date.now() - new Date(startedAt).getTime()) / 60000))} min`; }
+export function estimateRemaining(startedAt: string | null, pagesScanned = 0, maxPages = 1) { if (!startedAt || !pagesScanned) return 'calcul en cours'; const elapsed = Math.max(1, (Date.now() - new Date(startedAt).getTime()) / 60000); return `${Math.max(0, Math.ceil((elapsed / pagesScanned) * Math.max(0, maxPages - pagesScanned)))} min`; }

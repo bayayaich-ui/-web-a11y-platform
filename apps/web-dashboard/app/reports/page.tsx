@@ -1,0 +1,3 @@
+import { ModuleIntro } from '../../components/ModuleIntro';
+
+export default function ReportsPage() { return <div className="space-y-8"><ModuleIntro eyebrow="Pilotage" title="Rapports" description="Préparez vos synthèses de conformité et suivez l’évolution des scores dans le temps." /><div className="rounded-2xl border border-dashed border-[var(--color-border)] bg-white p-10 text-center"><p className="font-display text-xl font-semibold text-[#102d4f]">Les rapports sont prêts à être configurés</p><p className="mt-2 text-sm text-[var(--color-muted)]">Les données de scans seront disponibles ici pour vos exports et comparatifs.</p></div></div>; }

@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.services.queue_consumer import start_consumer
 from app.api.sites.routes import router as sites_router
 from app.api.scans.routes import router as scans_router
-from app.api.violations.routes import router as violations_router
+from app.api.auth.routes import router as auth_router
 
 logging.basicConfig(level=logging.INFO)
 
@@ -37,11 +37,12 @@ app.add_middleware(
     allow_origins=allow_origins,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 app.include_router(sites_router)
 app.include_router(scans_router)
-app.include_router(violations_router)
+app.include_router(auth_router)
 
 
 @app.get("/")
