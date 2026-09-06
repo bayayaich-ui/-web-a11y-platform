@@ -23,7 +23,28 @@ export async function connectQueue(): Promise<Channel> {
     try {
       console.log(`Connecting to RabbitMQ (${url}) attempt #${attempt}`);
       connection = await amqp.connect(url);
+
+      connection.on('error', (err) => {
+        console.error('RabbitMQ connection error:', err?.message || err);
+        channel = null;
+        connection = null;
+      });
+
+      connection.on('close', () => {
+        console.warn('RabbitMQ connection closed; resetting channel state');
+        channel = null;
+        connection = null;
+      });
+
       channel = await connection.createChannel();
+      channel.on('error', (err) => {
+        console.error('RabbitMQ channel error:', err?.message || err);
+        channel = null;
+      });
+      channel.on('close', () => {
+        console.warn('RabbitMQ channel closed; resetting channel state');
+        channel = null;
+      });
 
       // durable: true = la file survit à un redémarrage de RabbitMQ,
       // important pour ne pas perdre un job de scan en cours
