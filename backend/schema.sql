@@ -24,6 +24,8 @@ CREATE TABLE sites (
     user_id     uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     url         text NOT NULL,
     name        text,
+    scan_mode   text NOT NULL DEFAULT 'single_page'
+                CHECK (scan_mode IN ('single_page', 'full_site')),
     created_at  timestamp NOT NULL DEFAULT now()
 );
 
@@ -71,7 +73,13 @@ CREATE TABLE violations (
     wcag_criteria   text[],                    -- ex: ['1.4.3']
     impact          text NOT NULL
                     CHECK (impact IN ('critical', 'serious', 'moderate', 'minor')),
-    selector        text,                      -- ex: '.btn-primary'
+    element         text,                      -- ex: '.btn-primary'
+    message         text,
+    source_file     text,
+    source_line     integer,
+    source_column   integer,
+    priority        text,
+    diagnostic      jsonb,
     details         jsonb,                     -- ex: { "ratio": 2.1, "required": 4.5 }
     created_at      timestamp NOT NULL DEFAULT now()
 );

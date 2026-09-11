@@ -1,7 +1,7 @@
 import './load-env';
 import { connectQueue, closeQueue } from './queue-consumer/rabbitmq-connection';
 import { startConsuming, ScanJob } from './queue-consumer/job-handler';
-import { publishPageResult, publishScanCompleted } from './queue-consumer/result-publisher';
+import { publishPageResult, publishScanCompleted, publishScanFailed, publishScanProgress } from './queue-consumer/result-publisher';
 import { BrowserPoolManager } from './browser-pool/pool-manager';
 import { crawlSite } from './crawler/crawler';
 import { captureAndStoreScreenshot } from './screenshot/screenshot-service';
@@ -14,6 +14,16 @@ import { ViolationBrute } from './diagnostic/types';
 const diagnosticService = process.env.GEMINI_API_KEY?.trim()
   ? new DiagnosticService(process.env.GEMINI_API_KEY)
   : null;
+const SCAN_TIMEOUT_MS = Number(process.env.SCAN_TIMEOUT_MS ?? 300000);
+const PAGE_TIMEOUT_MS = Number(process.env.PAGE_TIMEOUT_MS ?? 120000);
+const DIAGNOSTIC_TIMEOUT_MS = Number(process.env.DIAGNOSTIC_TIMEOUT_MS ?? 30000);
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`${label} timeout after ${timeoutMs}ms`)), timeoutMs)),
+  ]);
+}
 
 // Transforme le format retourné par axe-runner/parser en format attendu par le diagnostic IA
 function toViolationBrute(axeViolation: any): ViolationBrute {
@@ -25,6 +35,9 @@ function toViolationBrute(axeViolation: any): ViolationBrute {
     message: axeViolation.description ?? axeViolation.help,
     wcag: (axeViolation.wcag ?? []).map((w: any) => w.id),
     help: axeViolation.help,
+    sourceFile: premierElement?.sourceFile ?? null,
+    sourceLine: premierElement?.sourceLine ?? null,
+    sourceColumn: premierElement?.sourceColumn ?? null,
   };
 }
 
@@ -66,7 +79,11 @@ export async function processViolationsWithDiagnostics(
     logger.log('[AI] Génération du diagnostic...');
 
     try {
-      const { diagnostic } = await service.genererDiagnostic(violationBrute);
+      const { diagnostic } = await withTimeout(
+        service.genererDiagnostic(violationBrute),
+        DIAGNOSTIC_TIMEOUT_MS,
+        `AI diagnostic for ${violationBrute.rule}`,
+      );
       violationItem.diagnostic = diagnostic;
       diagnosticsReussis += 1;
       logger.log('[AI] Diagnostic réussi');
@@ -93,13 +110,20 @@ async function processPage(
   job: ScanJob,
   pool: BrowserPoolManager,
   channel: any
-) {
+): Promise<boolean> {
   const { page, context } = await pool.acquirePage();
   try {
+    await publishScanProgress(channel, { scan_id: job.scan_id, progress: 20, current_step: 'navigation' });
+    const navigationStartedAt = Date.now();
+    console.log(`[SCAN ${job.scan_id}] page:navigate url=${crawledPage.url}`);
     await page.goto(crawledPage.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    console.log(`[SCAN ${job.scan_id}] page:loaded duration_ms=${Date.now() - navigationStartedAt}`);
 
     // 1. Détection des violations avec axe-core
+    console.log(`[SCAN ${job.scan_id}] axe:start`);
+    await publishScanProgress(channel, { scan_id: job.scan_id, progress: 40, current_step: 'axe_analysis' });
     const axeResults = await runAxeScan(page);
+    console.log(`[SCAN ${job.scan_id}] axe:end`);
     const violationsBrutes = parseAxeResults(axeResults?.violations ?? []);
 
     if (!Array.isArray(axeResults?.violations)) {
@@ -119,6 +143,7 @@ async function processPage(
       diagnosticService,
       console,
     );
+    await publishScanProgress(channel, { scan_id: job.scan_id, progress: 70, current_step: 'diagnostics' });
 
     // 3. Calcul de la priorité (croisement axe-core + LLM) et tri
     const violationsTriees = prioriserViolations(violationsAvecDiagnostic);
@@ -128,6 +153,7 @@ async function processPage(
     const screenshotResult = await captureAndStoreScreenshot(page, job.scan_id, crawledPage.url);
 
     // 5. Publication du résultat complet vers RabbitMQ, déjà trié
+    await publishScanProgress(channel, { scan_id: job.scan_id, progress: 95, current_step: 'persisting_results' });
     publishPageResult(channel, {
       scan_id: job.scan_id,
       page_url: crawledPage.url,
@@ -137,27 +163,50 @@ async function processPage(
     });
 
     console.log(`Page ${crawledPage.url} : ${violationsTriees.length} violations diagnostiquées`);
+    return true;
   } catch (error) {
-    console.error(`Erreur lors du traitement de la page ${crawledPage.url}:`, error);
+    console.error(`[SCAN ${job.scan_id}] FAILED step=page url=${crawledPage.url}:`, error);
+    return false;
   } finally {
     await pool.releasePage(context);
   }
 }
 
 async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: any) {
-  console.log(`Démarrage du scan ${job.scan_id} pour ${job.url}`);
+  const startedAt = Date.now();
+  console.log(`[SCAN ${job.scan_id}] START url=${job.url}`);
+  let crawlFailedPages = 0;
 
-  const pages = await crawlSite(job.url, pool, {
+  const crawl = crawlSite(job.url, pool, {
     maxDepth: job.max_depth,
     maxPages: job.max_pages,
     scanMode: job.scan_mode ?? 'single_page',
+    onProgress: (discovered) => {
+      return publishScanProgress(channel, { scan_id: job.scan_id, progress: Math.min(10, discovered > 0 ? 5 : 0), current_step: 'crawling' });
+    },
+    onPageError: (url, error) => {
+      crawlFailedPages += 1;
+      console.error(`[SCAN ${job.scan_id}] CRAWL_PAGE_FAILED url=${url}:`, error);
+    },
   });
+  const pages = await withTimeout(crawl, SCAN_TIMEOUT_MS, 'crawl');
+  console.log(`[SCAN ${job.scan_id}] crawl:end pages=${pages.length} duration_ms=${Date.now() - startedAt}`);
+  if (pages.length === 0) throw new Error('Aucune page HTML accessible à scanner');
 
   const concurrency = pool.concurrency;
-  const tasks: Promise<void>[] = [];
+  const tasks: Promise<boolean>[] = [];
+  let failedPages = crawlFailedPages;
+  let completedPages = 0;
 
   for (const crawledPage of pages) {
-    const task = processPage(crawledPage, job, pool, channel);
+    const task = withTimeout(
+      processPage(crawledPage, job, pool, channel),
+      PAGE_TIMEOUT_MS,
+      `page ${crawledPage.url}`,
+    ).catch((error) => {
+      console.error(`[SCAN ${job.scan_id}] page timeout/error url=${crawledPage.url}:`, error);
+      return false;
+    });
     tasks.push(task);
 
     if (tasks.length >= concurrency) {
@@ -167,6 +216,9 @@ async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: a
           console.error('Erreur de page parallèle :', result.reason);
         }
       });
+      failedPages += results.filter((result) => result.status === 'fulfilled' && !result.value).length;
+      completedPages += results.length;
+      await publishScanProgress(channel, { scan_id: job.scan_id, progress: Math.min(90, 10 + Math.round(completedPages / pages.length * 80)), current_step: 'page_analysis' });
       tasks.length = 0;
     }
   }
@@ -178,13 +230,17 @@ async function processScanJob(job: ScanJob, pool: BrowserPoolManager, channel: a
         console.error('Erreur de page parallèle :', result.reason);
       }
     });
+    failedPages += results.filter((result) => result.status === 'fulfilled' && !result.value).length;
+    completedPages += results.length;
+    await publishScanProgress(channel, { scan_id: job.scan_id, progress: Math.min(90, 10 + Math.round(completedPages / pages.length * 80)), current_step: 'page_analysis' });
   }
 
-  console.log(`Scan ${job.scan_id} terminé : ${pages.length} pages traitées`);
+  console.log(`[SCAN ${job.scan_id}] COMPLETE pages=${pages.length} duration_ms=${Date.now() - startedAt}`);
   try {
-    publishScanCompleted(channel, {
+    await publishScanCompleted(channel, {
       scan_id: job.scan_id,
-      pages_processed: pages.length,
+      pages_processed: pages.length + failedPages,
+      pages_failed: failedPages,
       finished_at: new Date().toISOString(),
     });
   } catch (e) {
@@ -198,7 +254,16 @@ async function main() {
 
   const channel = await connectQueue();
 
-  await startConsuming(channel, (job) => processScanJob(job, pool, channel));
+  await startConsuming(
+    channel,
+    (job) => processScanJob(job, pool, channel),
+    (job, error) => publishScanFailed(channel, {
+      scan_id: job.scan_id,
+      failed_step: 'worker',
+      error: error instanceof Error ? error.message : String(error),
+      finished_at: new Date().toISOString(),
+    }),
+  );
   // start on-demand analysis consumer
   try {
     const { startAnalyzeConsumer } = await import('./queue-consumer/analyze-handler');

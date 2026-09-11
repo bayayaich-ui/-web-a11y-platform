@@ -112,10 +112,20 @@ def build_report_pdf(data: dict) -> bytes:
         if not matching: continue
         label, color = SEVERITY[impact]; canvas.text(50, canvas.y, label, 13, 'F2', color); canvas.y -= 24
         for violation in matching:
-            description, recommendation, element = violation.get('message') or 'No description available.', violation.get('recommendation') or 'Review the related WCAG guidance.', violation.get('element') or 'Not specified'; estimate = 100 + len(description) // 75 * 14 + len(recommendation) // 75 * 14
+            description = violation.get('message') or 'No description available.'
+            diagnostic = violation.get('explanation') or 'Diagnostic IA non disponible pour cette violation.'
+            recommendation = violation.get('recommendation') or 'Review the related WCAG guidance.'
+            corrected_code = violation.get('corrected_code') or 'Correction IA non disponible.'
+            element = violation.get('element') or 'Not specified'
+            location = violation.get('source_file') or 'Non disponible'
+            if violation.get('source_line'):
+                location += f":{violation['source_line']}"
+                if violation.get('source_column'):
+                    location += f":{violation['source_column']}"
+            estimate = 160 + (len(description) + len(diagnostic) + len(recommendation) + len(corrected_code)) // 75 * 14
             if canvas.y < estimate + 55: canvas.new_page(); canvas.section('Detailed Findings', 'Actionable diagnostics')
             canvas.rect(50, canvas.y - estimate, 495, estimate, '#ffffff', BORDER); canvas.text(64, canvas.y - 22, violation.get('rule', 'Unknown rule'), 12, 'F2', NAVY); canvas.text(530, canvas.y - 22, label.upper(), 7, 'F2', color, 'right')
-            current = canvas.wrapped(64, canvas.y - 45, description, 78, 9, 12, MUTED); canvas.text(64, current - 2, f"WCAG  {violation.get('wcag') or 'Not specified'}", 8, 'F2', BLUE); current = canvas.wrapped(64, current - 18, f"Affected element: {element}", 78, 8, 11, MUTED); canvas.wrapped(64, current - 4, f"Recommended fix: {recommendation}", 78, 9, 12, INK); canvas.y -= estimate + 18
+            current = canvas.wrapped(64, canvas.y - 45, description, 78, 9, 12, MUTED); canvas.text(64, current - 2, f"WCAG  {violation.get('wcag') or 'Not specified'}", 8, 'F2', BLUE); current = canvas.wrapped(64, current - 18, f"Affected element: {element}", 78, 8, 11, MUTED); current = canvas.wrapped(64, current - 4, f"Code location: {location}", 78, 8, 11, MUTED); current = canvas.wrapped(64, current - 4, f"AI diagnostic: {diagnostic}", 78, 9, 12, INK); current = canvas.wrapped(64, current - 4, f"Recommended fix: {recommendation}", 78, 9, 12, INK); canvas.wrapped(64, current - 4, f"Corrected code: {corrected_code}", 78, 8, 11, INK); canvas.y -= estimate + 18
     canvas.new_page(); canvas.section('Recommendations', 'Next steps'); canvas.wrapped(50, canvas.y, 'Priorisez les violations Critical et Serious, puis validez chaque correction sur les parcours concernes. Une nouvelle analyse permettra de mesurer les progres et de confirmer la resolution des points detectes.', 92, 11, 16, INK); canvas.y -= 48
     for index, impact in enumerate(['critical', 'serious', 'moderate']):
         label, color = SEVERITY[impact]; amount = data.get(impact, 0); canvas.rect(50, canvas.y - 48, 495, 48, '#ffffff', BORDER); canvas.rect(50, canvas.y - 48, 6, 48, color); canvas.text(70, canvas.y - 20, f'{index + 1:02d}  {label}', 11, 'F2', NAVY); canvas.text(70, canvas.y - 36, f'{amount} point(s) a traiter dans ce niveau', 9, 'F1', MUTED); canvas.y -= 65

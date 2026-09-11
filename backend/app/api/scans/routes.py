@@ -9,19 +9,20 @@ from app.database.database import get_db
 from app.database.models import Scan, Violation, Page
 from app.schemas.scan import ScanDetailResponse, ViolationResponse
 from app.database.database import SessionLocal
+from app.api.auth.routes import get_current_user
 
 router = APIRouter(prefix="/api/scans", tags=["scans"])
 
 
 @router.get("/{scan_id}", response_model=ScanDetailResponse)
-def get_scan_detail(scan_id: str, db: Session = Depends(get_db)):
+def get_scan_detail(scan_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
     """Get detailed information about a specific scan."""
     try:
         scan_uuid = UUID(scan_id)
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid scan ID format")
 
-    scan = db.query(Scan).filter(Scan.id == scan_uuid).first()
+    scan = db.query(Scan).join(Scan.site).filter(Scan.id == scan_uuid, Scan.site.has(user_id=user.id)).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
 
@@ -35,6 +36,10 @@ def get_scan_detail(scan_id: str, db: Session = Depends(get_db)):
         violations_moderate=scan.violations_moderate or 0,
         violations_minor=scan.violations_minor or 0,
         pages_scanned=scan.pages_scanned or 0,
+        pages_failed=scan.pages_failed or 0,
+        progress=scan.progress or 0,
+        current_step=scan.current_step or "pending",
+        error=scan.error,
         max_pages=scan.max_pages,
         scan_mode=getattr(scan, 'scan_mode', None),
         started_at=scan.started_at,
@@ -43,7 +48,7 @@ def get_scan_detail(scan_id: str, db: Session = Depends(get_db)):
 
 
 @router.get("/{scan_id}/violations", response_model=list[ViolationResponse])
-def get_violations(scan_id: str, db: Session = Depends(get_db)):
+def get_violations(scan_id: str, db: Session = Depends(get_db), user=Depends(get_current_user)):
     """Get all violations for a specific scan, grouped by page."""
     try:
         scan_uuid = UUID(scan_id)
@@ -51,7 +56,7 @@ def get_violations(scan_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Invalid scan ID format")
 
     # Verify scan exists
-    scan = db.query(Scan).filter(Scan.id == scan_uuid).first()
+    scan = db.query(Scan).join(Scan.site).filter(Scan.id == scan_uuid, Scan.site.has(user_id=user.id)).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
 
@@ -71,13 +76,16 @@ def get_violations(scan_id: str, db: Session = Depends(get_db)):
             message=v.message or "",
             page_url=v.page.url,
             priority=v.priority or "mineur",
+            source_file=v.source_file,
+            source_line=v.source_line,
+            source_column=v.source_column,
         )
         for v in violations
     ]
 
 
 @router.get("/{scan_id}/events")
-async def get_scan_events(scan_id: str, request: Request):
+async def get_scan_events(scan_id: str, request: Request, user=Depends(get_current_user)):
     try:
         scan_uuid = UUID(scan_id)
     except ValueError:
@@ -90,7 +98,7 @@ async def get_scan_events(scan_id: str, request: Request):
                 break
             db = SessionLocal()
             try:
-                scan = db.query(Scan).filter(Scan.id == scan_uuid).first()
+                scan = db.query(Scan).join(Scan.site).filter(Scan.id == scan_uuid, Scan.site.has(user_id=user.id)).first()
                 if not scan:
                     await asyncio.sleep(1)
                     continue
@@ -99,6 +107,10 @@ async def get_scan_events(scan_id: str, request: Request):
                     'id': str(scan.id),
                     'status': scan.status,
                     'pages_scanned': scan.pages_scanned or 0,
+                    'pages_failed': scan.pages_failed or 0,
+                    'progress': scan.progress or 0,
+                    'current_step': scan.current_step or "pending",
+                    'error': scan.error,
                     'max_pages': scan.max_pages,
                     'scan_mode': getattr(scan, 'scan_mode', None),
                     'started_at': scan.started_at.isoformat() if scan.started_at else None,
@@ -109,6 +121,10 @@ async def get_scan_events(scan_id: str, request: Request):
                     last_state = data
                     yield f"event: scan_update\n"
                     yield f"data: {json.dumps(data)}\n\n"
+                else:
+                    yield ": heartbeat\n\n"
+                if scan.status in {"completed", "completed_with_errors", "failed", "cancelled"}:
+                    break
             finally:
                 db.close()
             await asyncio.sleep(1)

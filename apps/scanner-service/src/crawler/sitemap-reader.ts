@@ -1,25 +1,32 @@
 import { Page } from 'playwright';
 
-export async function readSitemap(baseUrl: string, page: Page): Promise<string[]> {
-  const sitemapUrl = new URL('/sitemap.xml', baseUrl).toString();
+export async function readSitemap(baseUrl: string, page: Page, sitemapUrls?: string[]): Promise<string[]> {
+  const sitemapDocuments = sitemapUrls?.length
+    ? sitemapUrls.map((url) => new URL(url, baseUrl).toString())
+    : [new URL('/sitemap.xml', baseUrl).toString()];
+  const visited = new Set<string>();
 
-  try {
-    const response = await page.goto(sitemapUrl, {
-      timeout: 20000,
-      waitUntil: 'domcontentloaded',
-    });
+  async function readSitemapDocument(url: string): Promise<string[]> {
+    if (visited.has(url)) return [];
+    visited.add(url);
 
-    if (!response || response.status() !== 200) {
-      return []; // Pas de sitemap, ce n'est pas une erreur bloquante
+    try {
+      const response = await page.goto(url, { timeout: 20000, waitUntil: 'domcontentloaded' });
+
+      if (!response || response.status() !== 200) return [];
+
+      const content = await response.text();
+      const locs = [...content.matchAll(/<loc>\s*(.*?)\s*<\/loc>/gis)].map((match) => match[1].trim());
+      if (/<sitemapindex\b/i.test(content)) {
+        const nested = await Promise.all(locs.map((nestedUrl) => readSitemapDocument(new URL(nestedUrl, url).toString())));
+        return nested.flat();
+      }
+      return locs;
+    } catch {
+      return [];
     }
-
-    const content = await page.content();
-    const urlMatches = content.match(/<loc>(.*?)<\/loc>/g) || [];
-
-    return urlMatches.map(match =>
-      match.replace('<loc>', '').replace('</loc>', '').trim()
-    );
-  } catch {
-    return []; // Timeout ou site sans sitemap : on continue sans bloquer
   }
+
+  const results = await Promise.all(sitemapDocuments.map((url) => readSitemapDocument(url)));
+  return results.flat();
 }

@@ -6,3 +6,25 @@ build/
 .turbo/
 *.log
 .DS_Store
+# Next.js
+.next/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.venv64/
+venv/
+
+# Generated reports / local storage
+backend/storage/reports/
+apps/scanner-service/reports/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+
+# Local test/debug data
+sites.json
+violation.json
+violation_detail.png

@@ -53,6 +53,8 @@ ${JSON.stringify(violation, null, 2)}
       } catch (error) {
         lastError = error as Error;
         console.warn(`Tentative ${attempt + 1}/${this.maxRetries + 1} échouée:`, error);
+        const status = (error as { status?: number }).status;
+        if (status === 401 || status === 403 || status === 429) break;
       }
     }
 

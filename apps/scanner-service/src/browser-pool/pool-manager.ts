@@ -28,8 +28,10 @@ export class BrowserPoolManager {
       throw new Error('Le pool n\'est pas initialisé. Appelle initialize() d\'abord.');
     }
 
-    if (this.activeContexts >= this.maxContexts) {
-      throw new Error(`Limite de ${this.maxContexts} contextes simultanés atteinte.`);
+    // Jobs de pages sont lancés par lots; attendre ici évite de transformer
+    // une saturation normale du pool en échec de page.
+    while (this.activeContexts >= this.maxContexts) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
 
     // Un "context" isole les cookies/sessions entre deux scans différents,
@@ -49,7 +51,7 @@ export class BrowserPoolManager {
   // Libère une page après usage, sans fermer le navigateur entier
   async releasePage(context: BrowserContext): Promise<void> {
     await context.close();
-    this.activeContexts--;
+    this.activeContexts = Math.max(0, this.activeContexts - 1);
   }
 
   // Ferme complètement le navigateur (à la fin de tous les scans)

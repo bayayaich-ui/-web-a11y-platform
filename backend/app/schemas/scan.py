@@ -14,6 +14,10 @@ class ScanDetailResponse(BaseModel):
     violations_moderate: int
     violations_minor: int
     pages_scanned: int
+    pages_failed: int
+    progress: int
+    current_step: str
+    error: Optional[str]
     max_pages: Optional[int]
     scan_mode: Optional[str]
     started_at: Optional[datetime]
@@ -31,6 +35,9 @@ class ViolationResponse(BaseModel):
     message: str
     page_url: str
     priority: str
+    source_file: Optional[str] = None
+    source_line: Optional[int] = None
+    source_column: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -55,6 +62,9 @@ class ViolationDetailResponse(BaseModel):
     message: str
     page_url: str
     priority: str
+    source_file: Optional[str] = None
+    source_line: Optional[int] = None
+    source_column: Optional[int] = None
     diagnostic: Optional[dict]
     details: Optional[dict]
     fix: Optional[FixResponse]

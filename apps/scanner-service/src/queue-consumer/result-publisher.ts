@@ -21,11 +21,37 @@ export function publishPageResult(channel: Channel, result: PageResult): void {
 export interface ScanCompletedPayload {
   scan_id: string;
   pages_processed: number;
+  pages_failed?: number;
   finished_at: string;
 }
 
-export function publishScanCompleted(channel: Channel, payload: ScanCompletedPayload): void {
+export async function publishScanCompleted(channel: Channel, payload: ScanCompletedPayload): Promise<void> {
   const queue = 'scan.completed';
-  channel.assertQueue(queue, { durable: true }).catch(() => null);
+  await channel.assertQueue(queue, { durable: true });
+  channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)), { persistent: true });
+}
+
+export interface ScanFailedPayload {
+  scan_id: string;
+  failed_step: string;
+  error: string;
+  finished_at: string;
+}
+
+export async function publishScanFailed(channel: Channel, payload: ScanFailedPayload): Promise<void> {
+  const queue = 'scan.failed';
+  await channel.assertQueue(queue, { durable: true });
+  channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)), { persistent: true });
+}
+
+export interface ScanProgressPayload {
+  scan_id: string;
+  progress: number;
+  current_step: string;
+}
+
+export async function publishScanProgress(channel: Channel, payload: ScanProgressPayload): Promise<void> {
+  const queue = 'scan.progress';
+  await channel.assertQueue(queue, { durable: true });
   channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)), { persistent: true });
 }

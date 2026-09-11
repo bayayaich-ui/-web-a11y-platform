@@ -76,5 +76,9 @@ body {
 .login-aurora::after { width: 16rem; height: 16rem; left: -8rem; bottom: 8rem; }
 .login-logo-stage { background: rgba(223, 244, 251, 0.92); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2); }
 img[src="/login-logo.png"] { background-color: #dff4fb !important; box-shadow: 0 16px 35px rgba(16, 45, 79, 0.16); }
+@keyframes login-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 a { color: var(--color-primary); }
 button, input { font: inherit; }

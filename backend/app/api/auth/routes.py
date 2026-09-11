@@ -5,6 +5,7 @@ import re
 from app.database.database import get_db
 from app.database.models import User
 from app.schemas.auth import LoginRequest, RegisterRequest, UserResponse
+from app.config import AUTH_COOKIE_SECURE
 from app.services.auth import create_session_token, hash_password, read_session_token, verify_password
 
 router = APIRouter(prefix='/api/auth', tags=['auth'])
@@ -12,7 +13,15 @@ SESSION_COOKIE = 'a11y_session'
 
 
 def set_session(response: Response, user: User) -> None:
-    response.set_cookie(SESSION_COOKIE, create_session_token(user.id), httponly=True, secure=False, samesite='lax', max_age=7 * 24 * 60 * 60)
+    response.set_cookie(
+        SESSION_COOKIE,
+        create_session_token(user.id),
+        httponly=True,
+        secure=AUTH_COOKIE_SECURE,
+        samesite='lax',
+        max_age=7 * 24 * 60 * 60,
+        path='/',
+    )
 
 
 @router.post('/register', response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -41,7 +50,7 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
 
 @router.post('/logout', status_code=status.HTTP_204_NO_CONTENT)
 def logout(response: Response):
-    response.delete_cookie(SESSION_COOKIE)
+    response.delete_cookie(SESSION_COOKIE, path='/', secure=AUTH_COOKIE_SECURE, samesite='lax')
 
 
 def get_current_user(session: str | None = Cookie(default=None, alias=SESSION_COOKIE), db: Session = Depends(get_db)) -> User:
@@ -49,4 +58,9 @@ def get_current_user(session: str | None = Cookie(default=None, alias=SESSION_CO
     user = db.get(User, user_id) if user_id else None
     if not user:
         raise HTTPException(status_code=401, detail='Authentification requise.')
+    return user
+
+
+@router.get('/me', response_model=UserResponse)
+def current_user(user: User = Depends(get_current_user)):
     return user

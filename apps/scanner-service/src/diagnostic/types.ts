@@ -5,6 +5,9 @@ export interface ViolationBrute {
   message: string;
   wcag: string[];
   help: string;
+  sourceFile?: string | null;
+  sourceLine?: number | null;
+  sourceColumn?: number | null;
 }
 
 export interface Diagnostic {

@@ -11,10 +11,11 @@ export interface ScanJob {
 }
 
 type JobProcessor = (job: ScanJob) => Promise<void>;
+type JobFailurePublisher = (job: ScanJob, error: unknown) => Promise<void> | void;
 
 const MAX_RETRIES = 3;
 
-export async function startConsuming(channel: Channel, processJob: JobProcessor): Promise<void> {
+export async function startConsuming(channel: Channel, processJob: JobProcessor, publishFailure?: JobFailurePublisher): Promise<void> {
   await channel.consume(SCAN_JOBS_QUEUE, async (msg: ConsumeMessage | null) => {
     if (!msg) return;
 
@@ -42,9 +43,8 @@ export async function startConsuming(channel: Channel, processJob: JobProcessor)
         channel.ack(msg); // on retire l'original, le nouveau message avec le compteur incrémenté prend le relais
       } else {
         console.error(`Scan ${job.scan_id} abandonné après ${MAX_RETRIES} tentatives.`);
+        await publishFailure?.(job, error);
         channel.ack(msg); // on abandonne définitivement, sans boucler à l'infini
-        // Idéalement : publier un événement "scan.failed" ici, pour que le
-        // dashboard puisse informer le client que son scan a échoué
       }
     }
   });

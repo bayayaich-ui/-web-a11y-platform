@@ -102,6 +102,7 @@ class Site(Base):
 
     url = Column(Text)
     name = Column(Text)
+    scan_mode = Column(Text, nullable=False, default="single_page")
 
     created_at = Column(
         DateTime,
@@ -115,7 +116,8 @@ class Site(Base):
 
     scans = relationship(
         "Scan",
-        back_populates="site"
+        back_populates="site",
+        cascade="all, delete-orphan",
     )
 
 
@@ -145,6 +147,10 @@ class Scan(Base):
     scan_mode = Column(Text, default="single_page")
 
     pages_scanned = Column(Integer, default=0)
+    pages_failed = Column(Integer, default=0, nullable=False)
+    progress = Column(Integer, default=0, nullable=False)
+    current_step = Column(Text, default="pending", nullable=False)
+    error = Column(Text)
     score_global = Column(Integer)
 
     violations_critical = Column(Integer, default=0)
@@ -153,6 +159,7 @@ class Scan(Base):
     violations_minor = Column(Integer, default=0)
 
     started_at = Column(DateTime)
+    last_activity_at = Column(DateTime)
     finished_at = Column(DateTime)
 
     site = relationship(
@@ -162,7 +169,14 @@ class Scan(Base):
 
     pages = relationship(
         "Page",
-        back_populates="scan"
+        back_populates="scan",
+        cascade="all, delete-orphan",
+    )
+
+    report = relationship(
+        "Report",
+        back_populates="scan",
+        uselist=False,
     )
 
 
@@ -200,7 +214,8 @@ class Page(Base):
 
     violations = relationship(
         "Violation",
-        back_populates="page"
+        back_populates="page",
+        cascade="all, delete-orphan",
     )
 
 
@@ -230,6 +245,9 @@ class Violation(Base):
 
     element = Column(Text)
     message = Column(Text)
+    source_file = Column(Text, nullable=True)
+    source_line = Column(Integer, nullable=True)
+    source_column = Column(Integer, nullable=True)
     
     priority = Column(Text)
     diagnostic = Column(JSON)
@@ -250,7 +268,8 @@ class Violation(Base):
 
     fix = relationship(
         "Fix",
-        back_populates="violation"
+        back_populates="violation",
+        cascade="all, delete-orphan",
     )
 
 
@@ -284,3 +303,15 @@ class Fix(Base):
         "Violation",
         back_populates="fix"
     )
+
+
+class Report(Base):
+    __tablename__ = "reports"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    scan_id = Column(UUID(as_uuid=True), ForeignKey("scans.id", ondelete="CASCADE"), nullable=False, unique=True)
+    pdf_path = Column(Text, nullable=False)
+    content = Column(JSON, nullable=False)
+    generated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    scan = relationship("Scan", back_populates="report")
