@@ -1,6 +1,0 @@
-{
-  "/scans/[id]/page": "app/scans/[id]/page.js",
-  "/scans/[id]/violations/[violationId]/page": "app/scans/[id]/violations/[violationId]/page.js",
-  "/scans/[id]/violations/page": "app/scans/[id]/violations/page.js",
-  "/sites/page": "app/sites/page.js"
-}

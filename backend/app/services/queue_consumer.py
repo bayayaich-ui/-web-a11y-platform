@@ -11,12 +11,47 @@ from aio_pika.abc import AbstractIncomingMessage
 from app.database.database import SessionLocal
 from app.database.models import Scan, Page, Violation, Fix
 from app.services.scoring import compute_score_from_scan
+from app.config import SCAN_TIMEOUT_SECONDS
 
 logger = logging.getLogger("queue_consumer")
 
 SCAN_RESULTS_QUEUE = "scan.page_completed"
 SCAN_COMPLETED_QUEUE = "scan.completed"
+SCAN_FAILED_QUEUE = "scan.failed"
+SCAN_PROGRESS_QUEUE = "scan.progress"
 VIOLATION_ANALYSIS_COMPLETED_QUEUE = "violation.analysis.completed"
+
+
+def recover_stale_scans_once() -> int:
+    cutoff = datetime.utcnow().timestamp() - SCAN_TIMEOUT_SECONDS
+    db = SessionLocal()
+    try:
+        stale_scans = db.query(Scan).filter(Scan.status == "running", Scan.started_at != None).all()
+        recovered = 0
+        for scan in stale_scans:
+            activity_at = scan.last_activity_at or scan.started_at
+            if activity_at.timestamp() >= cutoff:
+                continue
+            if (scan.pages_scanned or 0) > 0:
+                scan.status = "completed_with_errors"
+                scan.progress = 100
+                scan.current_step = "completed_with_errors"
+                scan.error = f"Scan finalisé avec les résultats disponibles; activité interrompue après {SCAN_TIMEOUT_SECONDS} secondes."
+                scan.score_global = compute_score_from_scan(scan)
+            else:
+                scan.status = "failed"
+                scan.progress = min(99, scan.progress or 0)
+                scan.current_step = "worker_timeout"
+                scan.error = f"Aucun résultat reçu dans les {SCAN_TIMEOUT_SECONDS} secondes."
+            scan.finished_at = datetime.utcnow()
+            scan.last_activity_at = scan.finished_at
+            recovered += 1
+        if recovered:
+            db.commit()
+            logger.error("%d scan(s) récupéré(s) après timeout du worker", recovered)
+        return recovered
+    finally:
+        db.close()
 
 
 def normalize_wcag_criteria(value):
@@ -115,6 +150,7 @@ async def handle_scan_completed(message: AbstractIncomingMessage) -> None:
         try:
             scan_id = payload.get("scan_id")
             pages_processed = payload.get("pages_processed")
+            pages_failed = max(0, int(payload.get("pages_failed") or 0))
             finished_at = payload.get("finished_at")
 
             scan = db.query(Scan).filter(Scan.id == UUID(scan_id)).first()
@@ -123,18 +159,31 @@ async def handle_scan_completed(message: AbstractIncomingMessage) -> None:
                 return
 
             persisted_pages = scan.pages_scanned or 0
-            target_pages = scan.max_pages or 0
+            expected_pages = max(0, int(pages_processed or 0) - pages_failed)
 
-            # If the scan.completed event is stale, do not force a final state before the
-            # persisted page results have actually reached the completion threshold.
-            if isinstance(pages_processed, int) and pages_processed > persisted_pages:
-                scan.pages_scanned = max(persisted_pages, pages_processed)
+            scan.pages_failed = pages_failed
+            scan.last_activity_at = datetime.utcnow()
 
-            if target_pages and persisted_pages < target_pages:
+            # max_pages is only a cap. Completion must use the number of pages
+            # actually discovered by this crawl, not the configured cap.
+            if persisted_pages >= expected_pages and pages_failed > 0:
+                scan.status = "completed_with_errors"
+                scan.progress = 100
+                scan.current_step = "completed_with_errors"
+                scan.finished_at = parse_datetime(finished_at) or datetime.utcnow()
+                try:
+                    scan.score_global = compute_score_from_scan(scan)
+                except Exception:
+                    logger.exception("Erreur lors du calcul du score final (scan.completed_with_errors)")
+                db.commit()
+                logger.warning("Scan terminé avec erreurs: %s pages en échec, scan_id=%s", pages_failed, scan_id)
+                return
+
+            if persisted_pages < expected_pages:
                 logger.info(
                     "scan.completed ignoré tant que les résultats persistés ne sont pas à %s/%s pages pour scan_id=%s",
                     persisted_pages,
-                    target_pages,
+                    expected_pages,
                     scan_id,
                 )
                 db.rollback()
@@ -142,6 +191,9 @@ async def handle_scan_completed(message: AbstractIncomingMessage) -> None:
 
             # Only finalize once the persisted store is consistent with the configured threshold.
             scan.status = 'completed'
+            scan.progress = 100
+            scan.current_step = 'completed'
+            scan.error = None
             scan.finished_at = parse_datetime(finished_at) or datetime.utcnow()
             try:
                 scan.score_global = compute_score_from_scan(scan)
@@ -157,6 +209,78 @@ async def handle_scan_completed(message: AbstractIncomingMessage) -> None:
         finally:
             db.close()
 
+
+async def handle_scan_failed(message: AbstractIncomingMessage) -> None:
+    async with message.process():
+        try:
+            payload = json.loads(message.body.decode("utf-8"))
+            scan_id = UUID(payload["scan_id"])
+        except (json.JSONDecodeError, KeyError, ValueError):
+            logger.error("Message scan.failed invalide")
+            return
+
+        db = SessionLocal()
+        try:
+            scan = db.query(Scan).filter(Scan.id == scan_id).first()
+            if not scan:
+                logger.warning("Scan introuvable pour scan.failed scan_id=%s", scan_id)
+                return
+
+            has_partial_results = (scan.pages_scanned or 0) > 0
+            finished_at = parse_datetime(payload.get("finished_at")) or datetime.utcnow()
+            scan.finished_at = finished_at
+            scan.last_activity_at = finished_at
+            scan.error = payload.get("error", "Le worker du scanner a échoué.")[:2000]
+
+            if has_partial_results:
+                scan.status = "completed_with_errors"
+                scan.progress = 100
+                scan.current_step = "completed_with_errors"
+                try:
+                    scan.score_global = compute_score_from_scan(scan)
+                except Exception:
+                    logger.exception("Erreur lors du calcul du score final (scan.failed partial)")
+                db.commit()
+                logger.warning("[SCAN %s] PARTIAL_RESULTS status=completed_with_errors step=%s error=%s", scan_id, scan.current_step, scan.error)
+                return
+
+            scan.status = "failed"
+            scan.progress = min(99, scan.progress or 0)
+            scan.current_step = payload.get("failed_step", "worker")
+            try:
+                scan.score_global = compute_score_from_scan(scan)
+            except Exception:
+                logger.exception("Erreur lors du calcul du score final (scan.failed)")
+            db.commit()
+            logger.error("[SCAN %s] FAILED step=%s error=%s", scan_id, scan.current_step, scan.error)
+        except Exception:
+            db.rollback()
+            logger.exception("Échec de la persistance de scan.failed")
+            raise
+        finally:
+            db.close()
+
+
+async def handle_scan_progress(message: AbstractIncomingMessage) -> None:
+    async with message.process():
+        try:
+            payload = json.loads(message.body.decode("utf-8"))
+            scan_id = UUID(payload["scan_id"])
+            progress = max(0, min(99, int(payload["progress"])))
+        except (json.JSONDecodeError, KeyError, ValueError, TypeError):
+            logger.error("Message scan.progress invalide")
+            return
+        db = SessionLocal()
+        try:
+            scan = db.query(Scan).filter(Scan.id == scan_id).first()
+            if scan and scan.status not in {"completed", "failed", "cancelled"}:
+                scan.progress = progress
+                scan.current_step = str(payload.get("current_step", "running"))[:120]
+                scan.last_activity_at = datetime.utcnow()
+                db.commit()
+        finally:
+            db.close()
+
 def persist_page_result(db, payload: dict) -> None:
     scan_id = payload["scan_id"]
 
@@ -168,6 +292,8 @@ def persist_page_result(db, payload: dict) -> None:
     # If the scan was pending, mark it as running when first page result arrives
     if scan.status in (None, 'pending'):
         scan.status = 'running'
+    scan.current_step = 'persisting_results'
+    scan.last_activity_at = datetime.utcnow()
 
     page = Page(
         scan_id=scan.id,
@@ -192,6 +318,9 @@ def persist_page_result(db, payload: dict) -> None:
             impact=violation_brute.get("impact"),
             element=violation_brute.get("element"),
             message=violation_brute.get("message"),
+            source_file=violation_brute.get("sourceFile") or violation_brute.get("source_file"),
+            source_line=violation_brute.get("sourceLine") or violation_brute.get("source_line"),
+            source_column=violation_brute.get("sourceColumn") or violation_brute.get("source_column"),
             priority=priority,
             diagnostic=diagnostic,
         )
@@ -203,11 +332,15 @@ def persist_page_result(db, payload: dict) -> None:
             setattr(scan, counter_field, current + 1)
 
     scan.pages_scanned = (scan.pages_scanned or 0) + 1
+    scan.progress = min(99, round((scan.pages_scanned / max(scan.max_pages or 1, 1)) * 95))
 
     # If we've reached the configured max_pages, mark the scan as finished
     try:
         if scan.max_pages and scan.pages_scanned >= scan.max_pages:
             scan.status = 'completed'
+            scan.progress = 100
+            scan.current_step = 'completed'
+            scan.error = None
             scan.finished_at = datetime.utcnow()
             # compute final score when scan completes
             try:
@@ -249,6 +382,14 @@ async def start_consumer() -> None:
     logger.info("Consommateur en écoute sur la file %s", SCAN_COMPLETED_QUEUE)
     await completed_queue.consume(handle_scan_completed)
 
+    failed_queue = await channel.declare_queue(SCAN_FAILED_QUEUE, durable=True)
+    logger.info("Consommateur en écoute sur la file %s", SCAN_FAILED_QUEUE)
+    await failed_queue.consume(handle_scan_failed)
+
+    progress_queue = await channel.declare_queue(SCAN_PROGRESS_QUEUE, durable=True)
+    logger.info("Consommateur en écoute sur la file %s", SCAN_PROGRESS_QUEUE)
+    await progress_queue.consume(handle_scan_progress)
+
     # Listen for results of on-demand violation analysis
     analysis_queue = await channel.declare_queue(VIOLATION_ANALYSIS_COMPLETED_QUEUE, durable=True)
     logger.info("Consommateur en écoute sur la file %s", VIOLATION_ANALYSIS_COMPLETED_QUEUE)
@@ -289,9 +430,8 @@ async def handle_violation_analysis(message: AbstractIncomingMessage) -> None:
                 logger.warning("Violation introuvable pour analysis result: %s", violation_id)
                 return
 
-            # Build a structured diagnostic object prioritizing explicit fields
-            # from the correctif payload so the frontend has predictable keys.
-            diag_obj = None
+            # Keep every field returned by Gemini, then enrich it with fix data.
+            diag_obj = dict(diagnostic) if isinstance(diagnostic, dict) else {}
             if isinstance(correctif, dict):
                 summary = correctif.get('explication') or correctif.get('explication_simple') or diagnostic
                 impact_txt = correctif.get('impact') or (diagnostic.get('impact') if isinstance(diagnostic, dict) else None)
@@ -299,13 +439,13 @@ async def handle_violation_analysis(message: AbstractIncomingMessage) -> None:
                 correction = correctif.get('code_corrige') or correctif.get('correction') or None
                 correction_explanation = correctif.get('explication') or correctif.get('explanation') or None
 
-                diag_obj = {
+                diag_obj.update({
                     'summary': summary,
                     'impact': impact_txt,
                     'offending_code': offending,
                     'correction': correction,
                     'correction_explanation': correction_explanation,
-                }
+                })
                 v.diagnostic = diag_obj
 
                 # Persist WCAG references when provided by the correctif or diagnostic

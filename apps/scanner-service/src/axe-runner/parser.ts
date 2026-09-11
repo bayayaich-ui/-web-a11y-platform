@@ -20,7 +20,10 @@ export function parseAxeResults(violations: any[]) {
 
             affectedElements: violation.nodes.map((node: any) => ({
                 html: node.html,
-                target: node.target
+                target: node.target,
+                sourceFile: node.source?.file ?? node.sourceFile ?? node.file ?? null,
+                sourceLine: node.source?.line ?? node.sourceLine ?? node.line ?? null,
+                sourceColumn: node.source?.column ?? node.sourceColumn ?? node.column ?? null,
             }))
 
         };

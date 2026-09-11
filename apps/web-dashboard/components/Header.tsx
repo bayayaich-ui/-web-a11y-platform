@@ -3,21 +3,37 @@
 import { LogoutButton } from './LogoutButton';
 import { LanguageSwitcher, useLanguage } from './LanguageSwitcher';
 import { useEffect, useState } from 'react';
+import { fetchCurrentUser } from '../lib/api';
 
 export function Header() {
   const english = useLanguage() === 'en';
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
-    const readUser = () => {
+    const readStoredUser = () => {
       try {
         const user = JSON.parse(window.localStorage.getItem('a11y-user') ?? '{}');
         setUserName(user.name || user.email?.split('@')[0] || '');
       } catch { setUserName(''); }
     };
-    readUser();
-    window.addEventListener('a11y-auth-change', readUser);
-    return () => window.removeEventListener('a11y-auth-change', readUser);
+    const restoreSession = async () => {
+      try {
+        const user = await fetchCurrentUser();
+        if (user) {
+          window.localStorage.setItem('a11y-user', JSON.stringify({ name: user.name, email: user.email }));
+          setUserName(user.name || user.email.split('@')[0] || '');
+        } else {
+          window.localStorage.removeItem('a11y-user');
+          setUserName('');
+        }
+      } catch {
+        readStoredUser();
+      }
+    };
+    const handleAuthChange = () => { void restoreSession(); };
+    void restoreSession();
+    window.addEventListener('a11y-auth-change', handleAuthChange);
+    return () => window.removeEventListener('a11y-auth-change', handleAuthChange);
   }, []);
 
   return (

@@ -37,77 +37,53 @@ export function shouldSkipUrl(url: string): boolean {
 export async function crawlSite(
   startUrl: string,
   pool: BrowserPoolManager,
-  options: { maxDepth?: number; maxPages?: number; scanMode?: 'single_page' | 'full_site' } = {}
+  options: { maxDepth?: number; maxPages?: number; scanMode?: 'single_page' | 'full_site'; onProgress?: (discovered: number) => void | Promise<void>; onPageError?: (url: string, error: unknown) => void } = {}
 ): Promise<CrawlResult[]> {
   const queue = new UrlQueue(options.maxDepth ?? 3, options.maxPages ?? 50);
   const results: CrawlResult[] = [];
 
   const { page, context } = await pool.acquirePage();
-
-  // If single-page mode, only scan the startUrl and do not read sitemap/robots nor extract links.
   const scanMode = options.scanMode ?? 'single_page';
-  if (scanMode === 'single_page') {
-    console.log('Crawler: single_page mode — only the start URL will be scanned');
-    queue.add(startUrl, 0);
-  } else {
-    // 1. Lire robots.txt en premier pour connaître les restrictions
-    const robots = await readRobotsTxt(startUrl, page);
+  const startHost = new URL(startUrl).hostname;
+  let robots = { disallowedPaths: [] as string[], sitemapUrls: [] as string[] };
 
-    // 2. Essayer le sitemap (celui déclaré dans robots.txt, sinon l'emplacement standard)
-    const sitemapUrls = robots.sitemapUrls.length > 0
-      ? robots.sitemapUrls
-      : await readSitemap(startUrl, page);
-
-    console.log(`Crawler: robots rules disallowed=${robots.disallowedPaths.length} sitemapUrls=${sitemapUrls.length}`);
-
-    if (sitemapUrls.length > 0) {
-      sitemapUrls
-        .filter(url => isPathAllowed(url, robots.disallowedPaths))
-        .forEach((url) => queue.add(url, 0));
-    } else {
+  try {
+    if (scanMode === 'single_page') {
+      console.log('Crawler: single_page mode — only the start URL will be scanned');
       queue.add(startUrl, 0);
+    } else {
+      robots = await readRobotsTxt(startUrl, page);
+      const sitemapUrls = await readSitemap(startUrl, page, robots.sitemapUrls);
+      console.log(`Crawler: robots rules disallowed=${robots.disallowedPaths.length} sitemapUrls=${sitemapUrls.length}`);
+      const internalSitemapUrls = sitemapUrls.filter((url) => {
+        try { return new URL(url).hostname === startHost && isPathAllowed(url, robots.disallowedPaths); }
+        catch { return false; }
+      });
+      (internalSitemapUrls.length > 0 ? internalSitemapUrls : [startUrl]).forEach((url) => queue.add(url, 0));
     }
+    await options.onProgress?.(queue.visitedCount);
+
+    while (!queue.isEmpty) {
+      const current = queue.next();
+      if (!current) break;
+      if (shouldSkipUrl(current.url)) continue;
+
+      try {
+        const response = await page.goto(current.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        if (!response || !isHtmlMimeType(response.headers()['content-type'])) continue;
+        results.push({ url: current.url, title: await page.title(), depth: current.depth });
+        if (scanMode !== 'single_page') {
+          const links = await extractInternalLinks(page, startUrl);
+          links.filter((link) => isPathAllowed(link, robots.disallowedPaths)).forEach((link) => queue.add(link, current.depth + 1));
+          await options.onProgress?.(queue.visitedCount);
+        }
+      } catch (error) {
+        console.warn(`Impossible de scanner ${current.url}:`, error);
+        options.onPageError?.(current.url, error);
+      }
+    }
+    return results;
+  } finally {
+    await pool.releasePage(context);
   }
-
-  // 3. Parcourir la file, en respectant robots.txt à chaque nouveau lien trouvé
-  while (!queue.isEmpty) {
-    const current = queue.next();
-    if (!current) break;
-
-    if (shouldSkipUrl(current.url)) {
-      console.warn(`URL ignorée par le crawler (ressource non-HTML ou téléchargement probable) : ${current.url}`);
-      continue;
-    }
-
-    try {
-      const response = await page.goto(current.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-      if (!response) {
-        console.warn(`Aucune réponse reçue pour ${current.url}, page ignorée.`);
-        continue;
-      }
-
-      const contentType = response.headers()['content-type'];
-      if (!isHtmlMimeType(contentType)) {
-        console.warn(`Contenu non HTML détecté pour ${current.url} (${contentType}), page ignorée.`);
-        continue;
-      }
-
-      const title = await page.title();
-      results.push({ url: current.url, title, depth: current.depth });
-
-      if (scanMode !== 'single_page') {
-        const links = await extractInternalLinks(page, startUrl);
-        // re-check robots.txt filtering just in case
-        const robots = await readRobotsTxt(startUrl, page);
-        links
-          .filter(link => isPathAllowed(link, robots.disallowedPaths))
-          .forEach((link) => queue.add(link, current.depth + 1));
-      }
-    } catch (error) {
-      console.warn(`Impossible de scanner ${current.url}:`, error);
-    }
-  }
-
-  await pool.releasePage(context);
-  return results;
 }

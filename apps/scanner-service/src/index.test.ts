@@ -62,6 +62,44 @@ describe("axe accessibility scanner", () => {
 
     }, 60000);
 
+    it("conserve une localisation source si elle est déjà fournie par axe", async () => {
+        const service = {
+          genererDiagnostic: vi.fn().mockResolvedValue({
+            diagnostic: {
+              titre: 'Test',
+              severite: 'Majeur',
+              explication_simple: 'Explication',
+              impact_utilisateur: 'Impact',
+              recommandation: 'Recommandation',
+              code_corrige: '<div></div>',
+              ressources: [],
+            },
+          }),
+        };
+
+        const violations = [{
+          rule: 'button-name',
+          impact: 'serious',
+          description: 'Le bouton n’a pas de nom accessible.',
+          help: 'Aide',
+          affectedElements: [{
+            html: '<button class="submit">Login</button>',
+            target: ['button.submit'],
+            sourceFile: 'src/components/LoginForm.tsx',
+            sourceLine: 48,
+            sourceColumn: 5,
+          }],
+          wcag: [{ id: '4.1.2' }],
+        }];
+
+        const result = await processViolationsWithDiagnostics(violations as any, service as any);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].violation.sourceFile).toBe('src/components/LoginForm.tsx');
+        expect(result[0].violation.sourceLine).toBe(48);
+        expect(result[0].violation.sourceColumn).toBe(5);
+    });
+
     it("conserve les violations quand le diagnostic IA réussi", async () => {
         const service = {
           genererDiagnostic: vi.fn().mockResolvedValue({

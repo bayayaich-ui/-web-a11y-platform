@@ -6,6 +6,8 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
+from app.config import AUTH_SECRET
+
 
 PASSWORD_ITERATIONS = 310_000
 SESSION_TTL = timedelta(days=7)
@@ -55,10 +57,7 @@ def read_session_token(token: str | None) -> UUID | None:
 
 
 def _secret() -> bytes:
-    secret = os.getenv('AUTH_SECRET')
-    if not secret:
-        raise RuntimeError('AUTH_SECRET doit être défini en production')
-    return secret.encode()
+    return AUTH_SECRET.encode()
 
 
 def _encode(value: bytes) -> str:
